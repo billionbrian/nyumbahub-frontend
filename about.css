@@ -1,0 +1,221 @@
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  color: #222;
+  background-color: #fff;
+  scroll-behavior: smooth;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar .logo h1 {
+  color: #ffb400;
+  font-weight: 700;
+}
+
+.navbar ul {
+  display: flex;
+  list-style: none;
+}
+
+.navbar ul li {
+  margin-left: 30px;
+}
+
+.navbar ul li a {
+  color: #f5f5f5;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar ul li a:hover,
+.navbar ul li a.active {
+  color: #ffb400;
+}
+
+/* Hero Section */
+.hero {
+  height: 100vh;
+  background: url('pexels-expect-best-79873-323780.jpg') no-repeat center center/cover;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  animation: fadeInUp 1.2s ease;
+}
+
+.hero-text h2 {
+  font-size: 3rem;
+  color: #ffb400;
+}
+
+.hero-text p {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  color: #eee;
+}
+
+/* Sections */
+section {
+  padding: 100px 60px;
+  text-align: center;
+}
+
+.introduction h2,
+.services-overview h2,
+.house-listings h2,
+.testimonials h2,
+.call-to-action h2 {
+  font-size: 2rem;
+  color: #ffb400;
+  margin-bottom: 20px;
+}
+
+.services-overview ul {
+  list-style: none;
+  padding: 0;
+}
+
+.services-overview li {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+/* House listings */
+.house-grid {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.house-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  transition: transform 0.3s ease;
+}
+
+.house-card:hover {
+  transform: scale(1.05);
+}
+
+.house-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Testimonials */
+.testimonials blockquote {
+  margin: 20px auto;
+  max-width: 600px;
+  font-style: italic;
+  color: #555;
+  background: #f8f8f8;
+  padding: 20px;
+  border-left: 5px solid #ffb400;
+  border-radius: 10px;
+}
+
+/* Call to Action */
+.call-to-action {
+  background: #ffb400;
+  color: #1a1a1a;
+  border-radius: 10px;
+  margin: 40px auto;
+}
+
+.cta-button {
+  display: inline-block;
+  margin-top: 15px;
+  background: #000;
+  color: #ffb400;
+  padding: 12px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Footer */
+footer {
+  background: #111;
+  color: #ccc;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+footer a {
+  color: #ffb400;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(50px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeInUp 1.2s ease;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+  }
+
+  .house-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-text h2 {
+    font-size: 2rem;
+  }
+}

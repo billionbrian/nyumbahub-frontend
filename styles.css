@@ -1,0 +1,80 @@
+/* Modern Privacy Policy Styling */
+
+body {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    background: #blue ;
+    color: #222;
+    margin: 0;
+    padding: 0;
+    text-align: :right
+}
+
+.privacy-policy-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 40px 32px;
+}
+
+.privacy-policy-container h1,
+.privacy-policy-container h2,
+.privacy-policy-container h3 {
+    color: #2a5d9f;
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+.privacy-policy-container h1 {
+    font-size: 2.2rem;
+    border-bottom: 2px solid #e3e7ee;
+    padding-bottom: 12px;
+    margin-bottom: 32px;
+}
+
+.privacy-policy-container h2 {
+    font-size: 1.4rem;
+    margin-top: 32px;
+}
+
+.privacy-policy-container h3 {
+    font-size: 1.1rem;
+    margin-top: 24px;
+}
+
+.privacy-policy-container p,
+.privacy-policy-container ul,
+.privacy-policy-container ol {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 18px;
+}
+
+.privacy-policy-container ul,
+.privacy-policy-container ol {
+    padding-left: 24px;
+}
+
+.privacy-policy-container a {
+    color: #2a5d9f;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.privacy-policy-container a:hover {
+    color: #17406b;
+}
+
+@media (max-width: 600px) {
+    .privacy-policy-container {
+        padding: 18px 8px;
+    }
+    .privacy-policy-container h1 {
+        font-size: 1.5rem;
+    }
+    .privacy-policy-container h2 {
+        font-size: 1.1rem;
+    }
+}

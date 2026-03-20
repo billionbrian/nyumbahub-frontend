@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy of EasyHouse Website">
+    <title>Privacy Policy - NyumbaHub</title>
+
+    <style>
+        /* === GLOBAL STYLING === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            background: url('modern-apartment-bg.jpg') center/cover no-repeat fixed;
+            color: #f9f9f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Dark overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 30, 0.85);
+            z-index: -1;
+        }
+
+        header {
+            text-align: center;
+            padding: 70px 20px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            color: #00e1a3;
+            text-shadow: 0 0 10px rgba(0, 225, 163, 0.5);
+            letter-spacing: 1px;
+            animation: fadeInDown 1s ease-in-out;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        section {
+            margin-bottom: 40px;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #00e1a3;
+            margin-bottom: 15px;
+            border-left: 5px solid #00e1a3;
+            padding-left: 10px;
+            text-shadow: 0 0 5px rgba(0, 225, 163, 0.4);
+        }
+
+        p,
+        li {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #e0e0e0;
+        }
+
+        ul {
+            margin-left: 25px;
+        }
+
+        a {
+            color: #00e1a3;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #ffffff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ccc;
+            font-size: 0.9em;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            main {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Privacy Policy</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Introduction</h2>
+            <p>Welcome to <strong>NyumbaHub</strong>. Your privacy is important to us. This Privacy Policy explains how
+                we collect, use, and safeguard your personal information when you use our website and services.</p>
+        </section>
+
+        <section>
+            <h2>Information We Collect</h2>
+            <ul>
+                <li><strong>Personal Information:</strong> Such as your name, email address, and phone number.</li>
+                <li><strong>Usage Data:</strong> Includes details on how you interact with our website.</li>
+                <li><strong>Cookies:</strong> Small data files to enhance your browsing experience.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>How We Use Your Information</h2>
+            <p>We use your information to personalize your experience, communicate with you, process your requests, and
+                improve our services while maintaining strong security standards.</p>
+        </section>
+
+        <section>
+            <h2>Sharing Your Information</h2>
+            <p>Your data will never be sold or shared with third parties, except where legally required or essential for
+                service delivery (e.g., payment processing).</p>
+        </section>
+
+        <section>
+            <h2>Your Rights</h2>
+            <p>You have the right to access, update, or delete your personal information at any time. Please reach out
+                to us to exercise these rights.</p>
+        </section>
+
+        <section>
+            <h2>Contact Us</h2>
+            <p>If you have any questions or concerns about this Privacy Policy, contact us at
+                <a href="mailto:easyhouse31@gmail.com">easyhouse31@gmail.com</a>.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NyumbaHub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Reveal animation when scrolling
+        const sections = document.querySelectorAll("section");
+
+        function revealOnScroll() {
+            const windowHeight = window.innerHeight;
+            sections.forEach(sec => {
+                const secTop = sec.getBoundingClientRect().top;
+                if (secTop < windowHeight - 100) sec.classList.add("visible");
+            });
+        }
+
+        window.addEventListener("scroll", revealOnScroll);
+        revealOnScroll();
+    </script>
+</body>
+
+</html>

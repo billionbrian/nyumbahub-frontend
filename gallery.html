@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | NyumbaHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1b1b1b, #2b1055);
+      color: #fff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: transparent;
+      background: linear-gradient(90deg, #ffb400, #ffdd73);
+      background-clip: text;
+      -webkit-background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      color: #dcdcdc;
+    }
+
+    /* Gallery Grid */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: fadeInZoom 0.8s ease forwards;
+    }
+
+    .gallery-item:nth-child(even) {
+      animation-delay: 0.2s;
+    }
+
+    @keyframes fadeInZoom {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 15px;
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.1);
+      filter: brightness(80%);
+    }
+
+    .gallery-item .info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px 15px;
+      color: #ffb400;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      animation: zoomIn 0.5s ease;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      font-size: 2rem;
+      color: #ffb400;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      margin-top: 25px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .action-buttons button {
+      background: #ffb400;
+      border: none;
+      color: #111;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-buttons button:hover {
+      background: #fff;
+      transform: scale(1.05);
+    }
+
+    /* Contact Popup */
+    .contact-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 20, 20, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      z-index: 2000;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .contact-popup input,
+    .contact-popup textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .contact-popup button {
+      background: #ffb400;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.5rem;
+      color: #ffb400;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.4);
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 30px;
+    }
+
+    footer a {
+      color: #ffb400;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>NyumbaHub Gallery</h1>
+    <p>Explore premium homes, apartments, and villas across Kenya.</p>
+  </header>
+
+  <section class="gallery">
+    <div class="gallery-item">
+      <img src="pexels-asphotograpy-101808.jpg" alt="House 1" />
+      <div class="info">3BR Apartment - Kilimani - Ksh 85,000/month</div>
+    </div>
+    <div class="gallery-item">
+      <img src="pexels-binyaminmellish-106399.jpg" alt="House 2" />
+      <div class="info">2BR House - Westlands - Ksh 120,000/month</div>
+    </div>
+    <div class="gallery-item">
+      <img src="pexels-binyaminmellish-186077.jpg" alt="House 3" />
+      <div class="info">4BR Villa - Runda - Ksh 250,000/month</div>
+    </div>
+    <div class="gallery-item">
+      <img src="pexels-expect-best-79873-323780.jpg" alt="House 4" />
+      <div class="info">1BR Studio - Roysambu - Ksh 35,000/month</div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <span class="close-btn" id="closeBtn">&times;</span>
+    <img src="" alt="Preview" id="lightboxImg" />
+    <div class="action-buttons">
+      <button id="bookBtn">Book a Visit</button>
+      <button id="contactBtn">Contact Agent</button>
+    </div>
+  </div>
+
+  <div class="contact-popup" id="contactPopup">
+    <span class="popup-close" id="popupClose">&times;</span>
+    <h2>Contact Agent</h2>
+    <input type="text" placeholder="Your Name" />
+    <input type="email" placeholder="Your Email" />
+    <textarea placeholder="Your Message"></textarea>
+    <button>Send Inquiry</button>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 NyumbaHub. All rights reserved. | Designed with ❤️ in Kenya.</p>
+    <a href="index.html">Back to Home</a>
+  </footer>
+
+  <script>
+    const galleryItems = document.querySelectorAll(".gallery-item img");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImg");
+    const closeBtn = document.getElementById("closeBtn");
+    const contactBtn = document.getElementById("contactBtn");
+    const contactPopup = document.getElementById("contactPopup");
+    const popupClose = document.getElementById("popupClose");
+
+    galleryItems.forEach(img => {
+      img.addEventListener("click", () => {
+        lightbox.classList.add("active");
+        lightboxImg.src = img.src;
+      });
+    });
+
+    closeBtn.addEventListener("click", () => {
+      lightbox.classList.remove("active");
+    });
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) lightbox.classList.remove("active");
+    });
+
+    contactBtn.addEventListener("click", () => {
+      contactPopup.style.display = "block";
+    });
+
+    popupClose.addEventListener("click", () => {
+      contactPopup.style.display = "none";
+    });
+  </script>
+</body>
+
+</html>

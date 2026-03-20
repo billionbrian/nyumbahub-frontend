@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Services | NyumbaHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+        url('pexels-binyaminmellish-186077.jpg') center/cover no-repeat fixed;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 120px 20px 70px;
+      animation: fadeDown 1.2s ease-in-out;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      color: #ffb400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px rgba(255, 180, 0, 0.3);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #eee;
+      max-width: 700px;
+      margin: 0 auto;
+      opacity: 0.9;
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Services Section */
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      padding: 60px 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .service {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      padding: 30px 25px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .service.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .service::before {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, #ffb400, transparent, #00f2fe);
+      transition: 0.5s;
+      opacity: 0.4;
+    }
+
+    .service:hover::before {
+      top: 0;
+    }
+
+    .service:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .service h2 {
+      color: #ffb400;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(255, 180, 0, 0.4);
+    }
+
+    .service p {
+      color: #f1f1f1;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* CTA Section */
+    .cta {
+      text-align: center;
+      padding: 100px 20px;
+      background: rgba(0, 0, 0, 0.85);
+      margin-top: 80px;
+      backdrop-filter: blur(12px);
+      animation: fadeIn 1.5s ease;
+    }
+
+    .cta h3 {
+      font-size: 2rem;
+      color: #ffb400;
+      margin-bottom: 20px;
+    }
+
+    .cta p {
+      color: #ddd;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    .cta a {
+      background: linear-gradient(90deg, #ffb400, #ffdd73);
+      color: #111;
+      padding: 14px 36px;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta a:hover {
+      transform: scale(1.07);
+      background: #fff;
+      color: #111;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.6);
+      font-size: 0.9rem;
+      color: #bbb;
+      letter-spacing: 0.3px;
+    }
+
+    footer a {
+      color: #ffb400;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.3rem;
+      }
+
+      .cta h3 {
+        font-size: 1.6rem;
+      }
+
+      .service {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Our Services</h1>
+    <p>At NyumbaHub, we simplify house hunting and renting with smart tools, trusted listings, and secure payments.</p>
+  </header>
+
+  <section class="services">
+    <div class="service">
+      <h2>🏠 Smart Property Listings</h2>
+      <p>Landlords post verified listings easily, reaching genuine tenants through our growing network.</p>
+    </div>
+
+    <div class="service">
+      <h2>🖼️ Verified Gallery</h2>
+      <p>Explore authentic, high-quality property images verified for accuracy and availability.</p>
+    </div>
+
+    <div class="service">
+      <h2>💳 Easy Booking & Payments</h2>
+      <p>Reserve homes instantly and pay securely via M-Pesa or your preferred payment method.</p>
+    </div>
+
+    <div class="service">
+      <h2>📝 Digital Rental Agreements</h2>
+      <p>Sign digital contracts that are secure, convenient, and legally valid — right from your device.</p>
+    </div>
+
+    <div class="service">
+      <h2>📞 24/7 Support</h2>
+      <p>Our friendly support team is here day and night to guide you, resolve issues, and ensure peace of mind.</p>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h3>Find Your Next Home with NyumbaHub</h3>
+    <p>Join the smarter way to rent — transparent, fast, and secure. Start your journey today.</p>
+    <a href="contact.html">Contact Us</a>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 NyumbaHub. All rights reserved. | <a href="index.html">Back to Home</a></p>
+  </footer>
+
+  <script>
+    // Scroll-triggered animation
+    const cards = document.querySelectorAll(".service");
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add("visible");
+          }, index * 150); // stagger effect
+        }
+      });
+    }, { threshold: 0.2 });
+
+    cards.forEach(card => observer.observe(card));
+  </script>
+</body>
+
+</html>

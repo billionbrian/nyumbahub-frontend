@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landlord Dashboard - NyumbaHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: url('public/images/house-background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #2c3e50;
+        }
+
+        .dashboard-container {
+            padding: 20px 50px;
+            background: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #34495e;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 45px;
+        }
+
+        .section h2 {
+            margin-bottom: 15px;
+            color: #2980b9;
+        }
+
+        /* Table Styles */
+        .properties-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .properties-table th,
+        .properties-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .properties-table th {
+            background: #3498db;
+            color: #fff;
+        }
+
+        .properties-table tr:hover {
+            background: #f1f1f1;
+        }
+
+        /* Form Styles */
+        .property-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .property-form input,
+        .property-form textarea,
+        .property-form select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            font-size: 1rem;
+        }
+
+        .property-form button {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #27ae60;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .property-form button:hover {
+            background: #2ecc71;
+        }
+
+        /* Analytics */
+        .analytics-container {
+            background: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome, Landlord!</h1>
+
+        <!-- Properties Table -->
+        <div class="section my-properties">
+            <h2>My Properties</h2>
+            <table class="properties-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Available</th>
+                        <th>Validated</th>
+                        <th>Rating</th>
+                        <th>Views</th>
+                        <th>Inquiries</th>
+                    </tr>
+                </thead>
+                <tbody id="properties-list">
+                    <!-- Dynamic from backend -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Post Property Form -->
+        <div class="section post-property">
+            <h2>Post New Property</h2>
+            <form id="post-property-form" class="property-form">
+                <input type="text" name="title" placeholder="Property Title" required>
+                <textarea name="description" placeholder="Property Description" rows="4" required></textarea>
+                <input type="number" name="price" placeholder="Price" required>
+                <input type="text" name="images" placeholder="Image URLs (comma separated)" required>
+                <select name="available" required>
+                    <option value="true">Available</option>
+                    <option value="false">Not Available</option>
+                </select>
+                <button type="submit">Post Property</button>
+            </form>
+        </div>
+
+        <!-- Analytics -->
+        <div class="section analytics">
+            <h2>Analytics</h2>
+            <div class="analytics-container">
+                <canvas id="viewsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("token");
+        const form = document.getElementById("post-property-form");
+        const propertiesList = document.getElementById("properties-list");
+
+        // Fetch and render properties
+        async function fetchProperties() {
+            const res = await fetch("https://nyumbahub-backend.onrender.com/api/properties/my-properties", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const properties = await res.json();
+            renderProperties(properties);
+            renderAnalytics(properties);
+        }
+
+        function renderProperties(properties) {
+            propertiesList.innerHTML = '';
+            properties.forEach(p => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${p.title}</td>
+                    <td>$${p.price}</td>
+                    <td>${p.available ? 'Yes' : 'No'}</td>
+                    <td>${p.validated ? 'Yes' : 'No'}</td>
+                    <td>${p.rating}</td>
+                    <td>${p.analytics.views}</td>
+                    <td>${p.analytics.inquiries}</td>
+                `;
+                propertiesList.appendChild(tr);
+            });
+        }
+
+        // Chart.js analytics
+        function renderAnalytics(properties) {
+            const ctx = document.getElementById('viewsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: properties.map(p => p.title),
+                    datasets: [{
+                        label: 'Views',
+                        data: properties.map(p => p.analytics.views),
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)'
+                    }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // Handle property posting
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const data = {
+                title: form.title.value,
+                description: form.description.value,
+                price: form.price.value,
+                images: form.images.value.split(",").map(s => s.trim()),
+                available: form.available.value === "true"
+            };
+
+            const res = await fetch("https://nyumbahub-backend.onrender.com/api/properties", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert("Property posted successfully!");
+                fetchProperties();
+                form.reset();
+            } else {
+                const err = await res.json();
+                alert(err.message);
+            }
+        });
+
+        fetchProperties();
+    </script>
+</body>
+
+</html>

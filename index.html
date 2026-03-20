@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NyumbaHub - Find Your Perfect Home</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <h1 class="logo">Nyumba<span>Hub</span></h1>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="about.html">About</a>
+      <a href="services.html">Services</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="login-btn">Login</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h2>Find Your Perfect Home Faster</h2>
+      <p>Connecting tenants and landlords easily, securely, and affordably. Discover thousands of listings across Kenya
+        today.</p>
+
+      <!-- Search Form -->
+      <form id="searchForm" class="search-bar">
+        <input type="text" id="location" placeholder="Enter location (e.g. Nairobi)" />
+        <input type="number" id="price" placeholder="Max Price (KES)" />
+        <select id="size">
+          <option value="">Any Size</option>
+          <option value="1">1 Bedroom</option>
+          <option value="2">2 Bedrooms</option>
+          <option value="3">3 Bedrooms</option>
+          <option value="4">4+ Bedrooms</option>
+        </select>
+        <button type="submit">Search</button>
+      </form>
+
+      <button onclick="payWithMpesa('254712345678', 1000)" class="mpesa-btn">Pay with M-Pesa</button>
+    </div>
+  </section>
+
+  <!-- Search Results -->
+  <section class="results-section">
+    <div id="results"></div>
+    <div id="map"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 NyumbaHub. All rights reserved. | Designed with ❤️ in Kenya</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Example houses data
+    const houses = [
+      { id: 1, location: "Nairobi", price: 25000, size: 2 },
+      { id: 2, location: "Mombasa", price: 15000, size: 1 },
+      { id: 3, location: "Kisumu", price: 30000, size: 3 },
+      { id: 4, location: "Nakuru", price: 20000, size: 2 },
+      { id: 5, location: "Nairobi", price: 45000, size: 4 },
+    ];
+
+    const searchForm = document.getElementById("searchForm");
+    const resultsDiv = document.getElementById("results");
+
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const location = document.getElementById("location").value.toLowerCase();
+      const price = document.getElementById("price").value;
+      const size = document.getElementById("size").value;
+
+      const filtered = houses.filter(h =>
+        (location === "" || h.location.toLowerCase().includes(location)) &&
+        (price === "" || h.price <= parseInt(price)) &&
+        (size === "" || h.size == size)
+      );
+
+      displayResults(filtered);
+    });
+
+    function displayResults(list) {
+      resultsDiv.innerHTML = "";
+      if (list.length === 0) {
+        resultsDiv.innerHTML = "<p class='no-results'>No houses found. Try adjusting filters.</p>";
+        return;
+      }
+
+      list.forEach(house => {
+        const card = document.createElement("div");
+        card.classList.add("house-card");
+        card.innerHTML = `
+          <h3>${house.location}</h3>
+          <p>Price: <strong>KES ${house.price.toLocaleString()}</strong></p>
+          <p>Size: ${house.size} Bedroom(s)</p>
+        `;
+        resultsDiv.appendChild(card);
+      });
+    }
+  </script>
+</body>
+
+</html>

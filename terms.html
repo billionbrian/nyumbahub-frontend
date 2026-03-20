@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Terms of Service - NyumbaHub Real Estate Platform" />
+  <title>Terms of Service - NyumbaHub</title>
+
+  <style>
+    /* ======= RESET ======= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: url("modern-city-apartments.jpg") center/cover no-repeat fixed;
+      color: #f2f2f2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ======= OVERLAY ======= */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg,
+          rgba(0, 0, 0, 0.9),
+          rgba(20, 30, 60, 0.8));
+      z-index: -1;
+    }
+
+    /* ======= HEADER ======= */
+    header {
+      text-align: center;
+      padding: 80px 20px 40px;
+      backdrop-filter: blur(8px);
+    }
+
+    header h1 {
+      font-size: 2.8em;
+      color: #00e1a3;
+      text-shadow: 0 0 12px rgba(0, 225, 163, 0.5);
+      letter-spacing: 1px;
+      animation: fadeDown 1s ease-out;
+    }
+
+    header p {
+      color: #dcdcdc;
+      margin-top: 10px;
+      font-size: 1.1em;
+      opacity: 0.8;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    /* ======= CONTENT ======= */
+    main {
+      max-width: 900px;
+      margin: 0 auto 80px;
+      padding: 40px 25px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      animation: fadeInUp 1.2s ease;
+    }
+
+    section {
+      margin-bottom: 45px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.5s ease;
+    }
+
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h2 {
+      font-size: 1.7em;
+      color: #00e1a3;
+      margin-bottom: 15px;
+      border-left: 5px solid #00e1a3;
+      padding-left: 10px;
+      text-shadow: 0 0 5px rgba(0, 225, 163, 0.4);
+    }
+
+    p {
+      font-size: 1.05em;
+      line-height: 1.8;
+      color: #ddd;
+      margin-bottom: 10px;
+    }
+
+    a {
+      color: #00e1a3;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #fff;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 15px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #ccc;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* ======= ANIMATIONS ======= */
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ======= RESPONSIVE ======= */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.2em;
+      }
+
+      main {
+        padding: 25px 15px;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Terms of Service</h1>
+    <p>Understanding your rights and responsibilities while using NyumbaHub.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing or using NyumbaHub, you agree to abide by these Terms of Service. If you do not agree, please
+        refrain from using our platform.</p>
+    </section>
+
+    <section>
+      <h2>2. Changes to Terms</h2>
+      <p>We reserve the right to update or modify these terms at any time. Changes will be effective upon posting.
+        Continued use constitutes acceptance of the new terms.</p>
+    </section>
+
+    <section>
+      <h2>3. Use of the Website</h2>
+      <p>You agree to use our services only for lawful and intended purposes, and not to infringe upon the rights of
+        other users or interfere with the operation of the platform.</p>
+    </section>
+
+    <section>
+      <h2>4. Intellectual Property</h2>
+      <p>All website content, including text, images, graphics, and code, are the intellectual property of NyumbaHub or
+        its licensors. Unauthorized use or reproduction is prohibited.</p>
+    </section>
+
+    <section>
+      <h2>5. Limitation of Liability</h2>
+      <p>NyumbaHub is not liable for any indirect, incidental, or consequential damages arising from your use of our
+        platform. You agree to use the service at your own risk.</p>
+    </section>
+
+    <section>
+      <h2>6. Governing Law</h2>
+      <p>These Terms shall be governed by the laws of Kenya (or your applicable jurisdiction). Any disputes shall be
+        resolved in the competent courts of that jurisdiction.</p>
+    </section>
+
+    <section>
+      <h2>7. Contact Us</h2>
+      <p>If you have questions about these Terms, please <a href="contact.html">contact our support team</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 NyumbaHub. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Reveal on scroll
+    const sections = document.querySelectorAll("section");
+    function revealOnScroll() {
+      const windowHeight = window.innerHeight;
+      sections.forEach(sec => {
+        const top = sec.getBoundingClientRect().top;
+        if (top < windowHeight - 100) sec.classList.add("visible");
+      });
+    }
+    window.addEventListener("scroll", revealOnScroll);
+    revealOnScroll();
+  </script>
+</body>
+
+</html>

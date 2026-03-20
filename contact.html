@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | EasyHouse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ EmailJS CDN -->
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)),
+        url('pexels-binyaminmellish-106399.jpg') center/cover no-repeat fixed;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    .contact-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 1000px;
+      overflow: hidden;
+      animation: fadeIn 1.5s ease;
+    }
+
+    /* Left Info Panel */
+    .contact-info {
+      background: linear-gradient(135deg, rgba(255, 180, 0, 0.7), rgba(0, 242, 254, 0.6));
+      padding: 50px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #111;
+    }
+
+    .contact-info h1 {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .contact-info p {
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .contact-info .details {
+      margin-top: 20px;
+    }
+
+    .contact-info .details p {
+      margin: 8px 0;
+      font-size: 0.95rem;
+    }
+
+    .contact-info .details i {
+      margin-right: 10px;
+      color: #ffb400;
+    }
+
+    /* Right Form Panel */
+    .contact-form {
+      padding: 40px 30px;
+    }
+
+    .contact-form h2 {
+      text-align: center;
+      color: #ffb400;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      font-weight: 500;
+      color: #eee;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    input, textarea {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.02);
+    }
+
+    textarea {
+      resize: none;
+      height: 120px;
+    }
+
+    button {
+      background: linear-gradient(90deg, #ffb400, #ffdd73);
+      color: #111;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 16px rgba(255, 180, 0, 0.4);
+    }
+
+    /* Map Section */
+    .map {
+      margin-top: 40px;
+      text-align: center;
+      animation: fadeUp 1.5s ease;
+    }
+
+    .map iframe {
+      width: 100%;
+      height: 250px;
+      border: none;
+      border-radius: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .contact-info {
+        text-align: center;
+      }
+      .contact-info h1 {
+        font-size: 1.8rem;
+      }
+      .contact-form h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="contact-container">
+    <div class="contact-info">
+      <h1>Get In Touch</h1>
+      <p>We’re here to help you find your dream home or list your property. Let’s make it easy together.</p>
+      <div class="details">
+        <p>📞 <strong>Phone:</strong> +254 785 522 135</p>
+        <p>✉️ <strong>Email:</strong> easyhouse31@gmail.com</p>
+        <p>📍 <strong>Address:</strong> Nairobi, Kenya</p>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <h2>Send Us a Message</h2>
+
+      <!-- ✅ Add ID for JS targeting -->
+      <form id="contact-form">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="user_name" placeholder="Your full name" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="user_email" placeholder="Your email address" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Your message" required></textarea>
+
+        <button type="submit">Send Message</button>
+      </form>
+
+      <div class="map">
+        <iframe src="https://www.google.com/maps?q=Nairobi,Kenya&output=embed"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ EmailJS Script -->
+  <script>
+    // Initialize EmailJS
+    (function() {
+      emailjs.init("Mhdj4U6jkLXrDmgJa"); // 🔑 Replace with your EmailJS public key
+    })();
+
+    // Handle form submit
+    document.getElementById("contact-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      emailjs.sendForm("service_f20oq6t", "template_5hkaeyk", this)
+        .then(() => {
+          alert("✅ Message sent successfully! We'll get back to you soon.");
+          this.reset();
+        }, (error) => {
+          console.error("❌ Email send failed:", error);
+          alert("❌ Something went wrong. Please try again later.");
+        });
+    });
+  </script>
+</body>
+</html>
