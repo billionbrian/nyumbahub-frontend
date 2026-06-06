@@ -28,7 +28,7 @@ searchForm.addEventListener("submit", async function(e){
   const params = new URLSearchParams({ location, price, size });
 
   try {
-    const res = await fetch(`https://nyumbahub-backend.onrender.com?${params.toString()}`);
+    const res = await fetch(`http://localhost:8000/api/properties/?${params.toString()}`);
     const houses = await res.json();
     displayResults(houses);
   } catch (error) {
@@ -45,9 +45,11 @@ function displayResults(list) {
 
   // 1. Clear old markers
   markers.forEach(m => map.removeLayer(m));
-  async function payWithMpesa(phone, amount) {
+}
+
+async function payWithMpesa(phone, amount) {
   try {
-    const res = await fetch("https://nyumbahub-backend.onrender.com/api/pay", {
+    const res = await fetch("http://localhost:8000/api/pay", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone, amount }),

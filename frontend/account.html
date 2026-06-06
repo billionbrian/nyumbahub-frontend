@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account - NyumbaHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+        url('daniel-barnes-RKdLlTyjm5g-unsplash.jpg') center/cover no-repeat fixed;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffb400;
+    }
+
+    .navbar nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .navbar nav a:hover {
+      color: #ffb400;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      color: #ffb400;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .account-details {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .detail-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .detail-item label {
+      font-weight: 500;
+      color: #ccc;
+    }
+
+    .detail-item span {
+      font-weight: bold;
+      color: #ffb400;
+    }
+
+    .logout-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(90deg, #ff4444, #cc0000);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 2rem;
+      transition: transform 0.3s;
+    }
+
+    .logout-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .not-logged-in {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .not-logged-in a {
+      color: #ffb400;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .landlord-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .landlord-section h2 {
+      color: #ffb400;
+      margin-bottom: 1rem;
+    }
+
+    .add-property-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(90deg, #ffb400, #ffd76a);
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      transition: transform 0.3s;
+    }
+
+    .add-property-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .properties-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .property-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .property-card h3 {
+      color: #ffb400;
+      margin-bottom: 0.5rem;
+    }
+
+    .property-card p {
+      color: #ccc;
+      margin-bottom: 0.25rem;
+    }
+
+    .property-card .price {
+      font-weight: bold;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="logo">NyumbaHub</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="services.html">Services</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>My Account</h1>
+    
+    <div id="accountContent">
+      <div class="not-logged-in">
+        <p>You are not logged in.</p>
+        <p><a href="login.html">Login here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    // Fetch landlord's properties from backend
+    async function fetchLandlordProperties() {
+      try {
+        const token = getToken();
+        const response = await fetch('http://localhost:8000/api/properties/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.results || data;
+        }
+        return [];
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        return [];
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const accountContent = document.getElementById('accountContent');
+      
+      if (isAuthenticated()) {
+        const userData = getUserData();
+        
+        if (userData) {
+          let html = `
+            <div class="account-details">
+              <div class="detail-item">
+                <label>Username:</label>
+                <span>${userData.username || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <label>Email:</label>
+                <span>${userData.email || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <label>Role:</label>
+                <span>${userData.role || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <label>Phone:</label>
+                <span>${userData.phone || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <label>Member Since:</label>
+                <span>${userData.created_at || 'N/A'}</span>
+              </div>
+            </div>
+          `;
+
+          // Add landlord section if user is a landlord
+          if (userData.role === 'landlord') {
+            const properties = await fetchLandlordProperties();
+            
+            html += `
+              <div class="landlord-section">
+                <h2>My Properties</h2>
+                <button class="add-property-btn" onclick="window.location.href='add-property.html'">Add New Property</button>
+                <div class="properties-list">
+            `;
+            
+            if (properties.length === 0) {
+              html += `<p>You haven't added any properties yet.</p>`;
+            } else {
+              properties.forEach(property => {
+                html += `
+                  <div class="property-card">
+                    <h3>${property.title || 'Property'}</h3>
+                    <p>Location: ${property.location || 'N/A'}</p>
+                    <p>Bedrooms: ${property.bedrooms || 'N/A'}</p>
+                    <p class="price">KES ${property.rent_amount ? property.rent_amount.toLocaleString() : 'N/A'}/month</p>
+                    <p>Status: ${property.available ? 'Available' : 'Not Available'}</p>
+                  </div>
+                `;
+              });
+            }
+            
+            html += `
+                </div>
+              </div>
+            `;
+          }
+
+          html += `<button class="logout-btn" onclick="logout()">Logout</button>`;
+          accountContent.innerHTML = html;
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
