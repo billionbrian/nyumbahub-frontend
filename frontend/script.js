@@ -25,10 +25,28 @@ searchForm.addEventListener("submit", async function(e){
   const price = document.getElementById("price").value;
   const size = document.getElementById("size").value;
 
-  const params = new URLSearchParams({ location, price, size });
+  const params = new URLSearchParams();
+  if (location) params.append('location', location);
+  if (price) {
+    // Parse price range (e.g., "10000-20000" or "100000+")
+    if (price.includes('-')) {
+      const [min, max] = price.split('-');
+      params.append('min_price', min);
+      params.append('max_price', max);
+    } else if (price.includes('+')) {
+      const min = price.replace('+', '');
+      params.append('min_price', min);
+    } else {
+      params.append('min_price', price);
+    }
+  }
+  if (size) params.append('bedrooms', size);
 
   try {
-    const res = await fetch(`http://localhost:8000/api/properties/?${params.toString()}`);
+    const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+        ? window.location.origin
+        : 'http://localhost:8080';
+    const res = await fetch(`${apiBase}/api/properties/?${params.toString()}`);
     const houses = await res.json();
     displayResults(houses);
   } catch (error) {
@@ -49,7 +67,10 @@ function displayResults(list) {
 
 async function payWithMpesa(phone, amount) {
   try {
-    const res = await fetch("http://localhost:8000/api/pay", {
+    const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+        ? window.location.origin
+        : 'http://localhost:8080';
+    const res = await fetch(`${apiBase}/api/properties/pay/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone, amount }),

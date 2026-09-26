@@ -14,7 +14,16 @@ def serve_frontend_file(request, file_path=''):
     if not file_path or file_path == '':
         requested_path = frontend_dir / 'index.html'
     
-    # Check if the requested file exists
+    # Check if the requested file exists in frontend/ or frontend/public/
+    if not (requested_path.exists() and requested_path.is_file()):
+        public_path = frontend_dir / 'public' / file_path
+        if public_path.exists() and public_path.is_file():
+            requested_path = public_path
+        elif file_path in ('favicon.ico', 'favicon.png'):
+            logo_path = frontend_dir / 'logo.png'
+            if logo_path.exists() and logo_path.is_file():
+                requested_path = logo_path
+
     if requested_path.exists() and requested_path.is_file():
         # Determine content type
         content_type, encoding = mimetypes.guess_type(str(requested_path))

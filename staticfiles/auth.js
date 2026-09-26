@@ -44,7 +44,10 @@ async function fetchCurrentUser() {
         }
 
         console.log('fetchCurrentUser: Fetching from backend...');
-        const response = await fetch('http://localhost:8000/api/auth/me/', {
+        const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+            ? window.location.origin
+            : 'http://localhost:8080';
+        const response = await fetch(`${apiBase}/api/auth/me/`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -98,53 +101,46 @@ async function updateAuthUI() {
         console.log('updateAuthUI: User data:', userData);
         
         if (loginBtn) {
-            loginBtn.remove();
-            console.log('updateAuthUI: Login button removed');
+            loginBtn.style.display = 'none';
+        }
+
+        const signupBtn = document.querySelector('.navbar-right .signup-btn');
+        if (signupBtn) {
+            signupBtn.style.display = 'none';
+        }
+
+        const desktopLogoutBtn = document.getElementById('desktopLogoutBtn');
+        if (desktopLogoutBtn) {
+            desktopLogoutBtn.style.display = 'inline-flex';
         }
         
-        // check if auth links already exist
-        const existingAccountLink = nav.querySelector('.account-link');
-        const existingLogoutBtn = nav.querySelector('.logout-btn');
+        // add property link if user is a landlord
         const existingAddPropertyLink = nav.querySelector('.add-property-link');
-        
-        console.log('updateAuthUI: Existing links?', !!existingAccountLink, !!existingLogoutBtn);
-        
-        if (!existingAccountLink && !existingLogoutBtn) {
-            console.log('updateAuthUI: Adding auth links');
-            // the user profile button
-            const profileBtn = document.createElement('a');
-            profileBtn.href = 'account.html';
-            profileBtn.textContent = 'Profile';
-            profileBtn.classList.add('account-link', 'profile-btn');
-            
-            // add property link if user is a landlord
-            if (userData.role === 'landlord') {
-                console.log('updateAuthUI: User is landlord, adding Add Property link');
-                const addPropertyLink = document.createElement('a');
-                addPropertyLink.href = 'add-property.html';
-                addPropertyLink.textContent = 'Add Property';
-                addPropertyLink.classList.add('add-property-link');
-                nav.appendChild(addPropertyLink);
+        if (userData.role === 'landlord' && !existingAddPropertyLink) {
+            console.log('updateAuthUI: User is landlord, adding Add Property link');
+            const addPropertyLink = document.createElement('a');
+            addPropertyLink.href = 'add-property.html';
+            addPropertyLink.setAttribute('hx-get', 'add-property.html');
+            addPropertyLink.textContent = 'Add Property';
+            addPropertyLink.classList.add('add-property-link');
+            nav.appendChild(addPropertyLink);
+            if (window.htmx) {
+                window.htmx.process(nav);
             }
-            
-            //logout button
-            const logoutBtn = document.createElement('a');
-            logoutBtn.href = '#';
-            logoutBtn.textContent = 'Logout';
-            logoutBtn.classList.add('logout-btn');
-            logoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                logout();
-            });
-            
-            nav.appendChild(profileBtn);
-            nav.appendChild(logoutBtn);
-            console.log('updateAuthUI: Auth links added successfully');
-        } else {
-            console.log('updateAuthUI: Auth links already exist, skipping');
         }
     } else {
         console.log('updateAuthUI: User is not authenticated');
+        if (loginBtn) {
+            loginBtn.style.display = 'inline-flex';
+        }
+        const signupBtn = document.querySelector('.navbar-right .signup-btn');
+        if (signupBtn) {
+            signupBtn.style.display = 'inline-flex';
+        }
+        const desktopLogoutBtn = document.getElementById('desktopLogoutBtn');
+        if (desktopLogoutBtn) {
+            desktopLogoutBtn.style.display = 'none';
+        }
     }
 }
 

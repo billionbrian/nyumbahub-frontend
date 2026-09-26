@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Privacy Policy of EasyHouse Website">
     <title>Privacy Policy - NyumbaHub</title>
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="styles/global-ui.css">
 
     <style>
         /* === GLOBAL STYLING === */
@@ -37,15 +39,13 @@
             z-index: -1;
         }
 
-        header {
+        .page-hero {
             text-align: center;
-            padding: 70px 20px 40px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
+            padding: 30px 20px 25px;
         }
 
-        header h1 {
-            font-size: 2.8em;
+        .page-hero h1 {
+            font-size: clamp(2rem, 5vw, 2.8em);
             color: #00e1a3;
             text-shadow: 0 0 10px rgba(0, 225, 163, 0.5);
             letter-spacing: 1px;
@@ -66,13 +66,8 @@
         section {
             margin-bottom: 40px;
             transition: transform 0.4s ease, opacity 0.4s ease;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        section.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: none;
         }
 
         h2 {
@@ -155,12 +150,15 @@
     </style>
 </head>
 
-<body>
-    <header>
-        <h1>Privacy Policy</h1>
-    </header>
+<body hx-ext="head-support">
+    <div id="navbar"></div>
 
+    <div id="content-swap" class="content-swap" data-page="privacy-policy" hx-target="#content-swap" hx-select="#content-swap" hx-swap="outerHTML show:window:top" hx-push-url="true">
     <main>
+    <section class="page-hero">
+        <h1>Privacy Policy</h1>
+    </section>
+
         <section>
             <h2>Introduction</h2>
             <p>Welcome to <strong>NyumbaHub</strong>. Your privacy is important to us. This Privacy Policy explains how
@@ -202,25 +200,39 @@
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2026 NyumbaHub. All rights reserved.</p>
-    </footer>
+  <script>
+  (function() {
+    function initPrivacyPolicyPage() {
+      const sections = document.querySelectorAll('main section');
+      function revealOnScroll() {
+        const windowHeight = window.innerHeight;
+        sections.forEach(sec => {
+          if (sec.getBoundingClientRect().top < windowHeight - 100) sec.classList.add('visible');
+        });
+      }
+      window.addEventListener('scroll', revealOnScroll);
+      revealOnScroll();
+    }
 
-    <script>
-        // Reveal animation when scrolling
-        const sections = document.querySelectorAll("section");
+    window.PageInitializers = window.PageInitializers || {};
+    window.PageInitializers['privacy-policy'] = initPrivacyPolicyPage;
 
-        function revealOnScroll() {
-            const windowHeight = window.innerHeight;
-            sections.forEach(sec => {
-                const secTop = sec.getBoundingClientRect().top;
-                if (secTop < windowHeight - 100) sec.classList.add("visible");
-            });
-        }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPrivacyPolicyPage);
+    } else {
+      initPrivacyPolicyPage();
+    }
+  })();
+  </script>
+    </div>
 
-        window.addEventListener("scroll", revealOnScroll);
-        revealOnScroll();
-    </script>
+    <div id="footer"></div>
+
+    <script src="js/htmx.min.js"></script>
+    <script src="js/head-support.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="theme.js"></script>
+    <script src="auth.js"></script>
 </body>
 
 </html>

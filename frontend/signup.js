@@ -1,88 +1,98 @@
 document.addEventListener("DOMContentLoaded", () => {
     const signupForm = document.getElementById("signupForm");
+    const alertBox = document.getElementById("authAlert");
+    const submitBtn = document.getElementById("signupSubmitBtn");
 
-    if (signupForm) {
-        signupForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const username = document.getElementById("username").value;
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const role = document.getElementById("role").value;
-            const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            console.log("Sending signup data:", { username, name, email, phone, role });
-
-            try {
-                console.log("Attempting to connect to: http://localhost:8000/api/auth/signup/");
-                const response = await fetch("http://localhost:8000/api/auth/signup/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        username,
-                        name,
-                        email,
-                        phone,
-                        role,
-                        password,
-                    }),
-                });
-
-                console.log("Response status:", response.status);
-                
-                // Check if response is JSON or HTML
-                const contentType = response.headers.get("content-type");
-                console.log("Content-Type:", contentType);
-                
-                if (contentType && contentType.includes("application/json")) {
-                    const data = await response.json();
-                    console.log("Signup response:", data);
-
-                    if (response.ok) {
-                        alert("Signup successful!");
-                        window.location.href = "login.html";
-                    } else {
-                        alert(`Signup failed: ${JSON.stringify(data)}`);
-                    }
-                } else {
-                    // Handle HTML error response
-                    const text = await response.text();
-                    console.error("Server returned HTML instead of JSON:", text.substring(0, 200));
-                    alert(`Server error (Status ${response.status}). Check Django server logs for details.`);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert(`Signup failed: ${error.message}\n\nMake sure Django server is running on http://localhost:8000`);
-            }
-        });
-    } else {
-        console.error("Signup form not found in the HTML.");
+    function showAuthMessage(message, type = "error") {
+        if (alertBox) {
+            alertBox.className = `auth-alert ${type}`;
+            alertBox.textContent = message;
+            alertBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } else {
+            alert(message);
+        }
     }
+
+    if (!signupForm) return;
+
+    signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById("username").value.trim();
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const role = document.getElementById("role").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (!username || !name || !email || !phone || !role || !password) {
+            showAuthMessage("Please fill in all required fields.", "error");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showAuthMessage("Passwords do not match. Please double-check your password.", "error");
+            return;
+        }
+
+        const originalBtnHTML = submitBtn ? submitBtn.innerHTML : "";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "<span>Creating your account...</span>";
+        }
+        if (alertBox) {
+            alertBox.className = "auth-alert";
+            alertBox.textContent = "";
+        }
+
+        try {
+            const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+                ? window.location.origin
+                : 'http://localhost:8080';
+
+            const response = await fetch(`${apiBase}/api/auth/signup/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username,
+                    name,
+                    email,
+                    phone,
+                    role,
+                    password,
+                }),
+            });
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAuthMessage("Account created successfully! Redirecting to Sign In...", "success");
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 700);
+                } else {
+                    const errMsg =
+                        data.detail ||
+                        data.error ||
+                        (typeof data === "object" ? Object.values(data).flat().join(" ") : "Registration failed.");
+                    showAuthMessage(errMsg || "Could not create account. Please check your details.", "error");
+                }
+            } else {
+                showAuthMessage(`Server error (Status ${response.status}). Check Django server logs for details.`, "error");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            showAuthMessage("Unable to connect to the server. Make sure the backend is running (e.g. on port 8080).", "error");
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHTML;
+            }
+        }
+    });
 });
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

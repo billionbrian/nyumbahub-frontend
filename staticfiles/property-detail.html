@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Property Details - NyumbaHub</title>
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="styles/global-ui.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 180, 0, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.04) 0%, transparent 50%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background-color 250ms ease, color 250ms ease;
+    }
+
+    .detail-wrapper {
+      max-width: 1240px;
+      margin: 1.5rem auto 3rem;
+      padding: 0 1.25rem;
+    }
+
+    /* Top Navigation Strip */
+    .detail-top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      color: var(--brand-primary);
+      border-color: var(--brand-primary);
+      transform: translateX(-3px);
+    }
+
+    .top-action-btns {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn-action-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action-icon:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+    }
+
+    .btn-action-icon.saved {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    /* Header Title Section */
+    .detail-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-title {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+
+    .meta-loc {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .meta-badge.available { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .meta-badge.booked { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .meta-badge.maintenance { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Airbnb-Style Multi-Image Showcase */
+    .airbnb-gallery {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      background: var(--bg-tertiary);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 8px;
+      height: 440px;
+    }
+
+    .gallery-single {
+      grid-template-columns: 1fr;
+      height: 420px;
+    }
+
+    .gallery-main-col {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .gallery-main-col img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-sub-grid {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      height: 100%;
+    }
+
+    .gallery-sub-item {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .gallery-sub-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-main-col:hover img,
+    .gallery-sub-item:hover img {
+      transform: scale(1.04);
+    }
+
+    .gallery-photo-btn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      z-index: 5;
+      transition: all 0.2s ease;
+    }
+
+    .gallery-photo-btn:hover {
+      background: rgba(15, 23, 42, 0.98);
+      transform: scale(1.04);
+    }
+
+    /* Main Content Layout (2 Columns) */
+    .detail-body-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2.25rem;
+      align-items: start;
+    }
+
+    /* Left Column Sections */
+    .detail-left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .section-card h2,
+    .section-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Quick Specs Bar */
+    .specs-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .spec-box {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .spec-box-label {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .spec-box-val {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Host Card */
+    .host-card {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .host-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+      border: 3px solid var(--card-bg);
+      outline: 2px solid var(--border-color);
+      user-select: none;
+    }
+
+    .host-meta {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .host-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .host-role {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.35rem;
+    }
+
+    .host-contact-links {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-contact {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-whatsapp {
+      background: rgba(37, 211, 102, 0.15);
+      color: #25d366;
+      border: 1px solid rgba(37, 211, 102, 0.35);
+    }
+    .btn-whatsapp:hover {
+      background: #25d366;
+      color: #000;
+    }
+
+    .btn-phone {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+    .btn-phone:hover {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    /* Amenities Grid */
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .amenity-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .amenity-item svg {
+      color: var(--brand-primary);
+      flex-shrink: 0;
+    }
+
+    /* Right Column (Sticky Booking Widget) */
+    .booking-sidebar {
+      position: sticky;
+      top: 90px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .booking-price-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+
+    .booking-price-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .booking-price-cycle {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .booking-cost-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .cost-total {
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .btn-reserve {
+      width: 100%;
+      padding: 0.9rem;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-primary), var(--brand-hover));
+      color: #000000;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(255, 180, 0, 0.3);
+    }
+
+    .btn-reserve:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 180, 0, 0.45);
+    }
+
+    .btn-inquire {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 10px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-inquire:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+    }
+
+    .safety-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem;
+    }
+
+    .safety-callout svg {
+      color: #10b981;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .lightbox-content img {
+      max-width: 100%;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .lightbox-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .lightbox-prev { left: -60px; }
+    .lightbox-next { right: -60px; }
+
+    .lightbox-counter {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      margin-top: 0.8rem;
+    }
+
+    /* Payment Modal */
+    .payment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .payment-modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 460px;
+      width: 100%;
+      padding: 1.75rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 900px) {
+      .detail-body-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        height: 300px;
+      }
+
+      .gallery-sub-grid {
+        display: none;
+      }
+
+      .lightbox-prev { left: 10px; }
+      .lightbox-next { right: 10px; }
+    }
+  </style>
+</head>
+
+<body hx-ext="head-support">
+  <div id="navbar"></div>
+
+  <div id="content-swap" class="content-swap" data-page="property-detail" hx-target="#content-swap" hx-select="#content-swap" hx-swap="outerHTML show:window:top" hx-push-url="true">
+    <main>
+      <div class="detail-wrapper">
+        <!-- Top Nav -->
+        <div class="detail-top-nav">
+          <a href="index.html" hx-get="index.html" class="back-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5"></path>
+              <path d="M12 19l-7-7 7-7"></path>
+            </svg>
+            Back to Listings
+          </a>
+
+          <div class="top-action-btns">
+            <button class="btn-action-icon" id="shareBtn" onclick="shareListing()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Share
+            </button>
+            <button class="btn-action-icon" id="saveListingBtn" onclick="toggleSaveCurrentListing()">
+              <svg id="saveListingHeart" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <span id="saveListingText">Save</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="propertyContent">
+          <div style="text-align:center; padding: 4rem 1rem; color:var(--text-secondary);">
+            <p>Loading property details...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Fullscreen Lightbox Modal -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+      <div class="lightbox-content">
+        <button class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
+        <button class="lightbox-nav-btn lightbox-prev" onclick="prevLightboxImage(event)">&#10094;</button>
+        <img id="lightboxImg" src="" alt="Property Preview">
+        <button class="lightbox-nav-btn lightbox-next" onclick="nextLightboxImage(event)">&#10095;</button>
+        <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+      </div>
+    </div>
+
+    <!-- M-Pesa Payment / Booking Modal -->
+    <div class="payment-modal" id="paymentModal">
+      <div class="payment-modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h3 style="font-size:1.2rem; font-weight:700;">Secure M-Pesa Booking</h3>
+          <button style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary);" onclick="closePaymentModal()">&times;</button>
+        </div>
+        <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:1.2rem;">
+          Enter your Safaricom M-Pesa mobile number to receive an STK prompt on your phone for deposit reservation.
+        </p>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem;">Safaricom Phone Number</label>
+          <input type="text" id="mpesaPhone" placeholder="0712345678" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); font-size:0.95rem;">
+        </div>
+        <div style="margin-bottom:1.25rem;">
+          <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem;">Booking Amount (KES)</label>
+          <input type="number" id="mpesaAmount" readonly style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-tertiary); color:var(--text-primary); font-size:0.95rem; font-weight:700;">
+        </div>
+        <button class="btn-reserve" id="btnConfirmPay" onclick="submitMpesaPayment()">
+          <span>Send M-Pesa Prompt</span>
+        </button>
+        <div id="paymentFeedback" style="margin-top:0.8rem; font-size:0.84rem; display:none;"></div>
+      </div>
+    </div>
+
+    <script>
+    (function() {
+      let currentProperty = null;
+      let galleryImages = [];
+      let currentLightboxIdx = 0;
+
+      function getApiBase() {
+        if (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port)) {
+          return window.location.origin;
+        }
+        return 'http://localhost:8080';
+      }
+
+      function resolveUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+          return url;
+        }
+        return `${getApiBase()}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+
+      function getAvatarColor(key) {
+        const palettes = [
+          'linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)',
+          'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+          'linear-gradient(135deg, #059669 0%, #047857 100%)',
+          'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+          'linear-gradient(135deg, #db2777 0%, #be185d 100%)',
+          'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+          'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+          'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+          'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+          'linear-gradient(135deg, #e11d48 0%, #be123c 100%)',
+        ];
+        if (!key) return palettes[0];
+        const str = String(key).toLowerCase().trim();
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return palettes[Math.abs(hash) % palettes.length];
+      }
+
+      function getUserInitials(name) {
+        if (!name) return 'L';
+        const parts = name.trim().split(' ');
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return name.slice(0, 2).toUpperCase();
+      }
+
+      async function initPropertyDetailPage() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const propertyId = urlParams.get('id');
+        const propertyContent = document.getElementById('propertyContent');
+
+        if (!propertyContent) return;
+
+        if (!propertyId) {
+          propertyContent.innerHTML = '<div style="text-align:center; padding:3rem; color:#ef4444;"><h3>Property ID not found</h3><p>Please select a property from the listings.</p></div>';
+          return;
+        }
+
+        try {
+          const token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
+          const headers = { 'Content-Type': 'application/json' };
+          if (token) headers['Authorization'] = `Bearer ${token}`;
+
+          const res = await fetch(`${getApiBase()}/api/properties/${propertyId}/`, { headers });
+          if (res.ok) {
+            currentProperty = await res.json();
+            renderDetailPage(currentProperty);
+            updateSavedButtonState(currentProperty.id);
+          } else {
+            propertyContent.innerHTML = '<div style="text-align:center; padding:3rem; color:#ef4444;"><h3>Failed to load property details</h3><p>Status: ' + res.status + '</p></div>';
+          }
+        } catch (err) {
+          console.error('Error fetching property detail:', err);
+          propertyContent.innerHTML = '<div style="text-align:center; padding:3rem; color:#ef4444;"><h3>Error loading property details</h3></div>';
+        }
+      }
+
+      function renderDetailPage(p) {
+        const propertyContent = document.getElementById('propertyContent');
+        const status = (p.status || 'available').toLowerCase();
+        const statusLabel = status === 'maintenance' ? 'Under Renovation' : (status.charAt(0).toUpperCase() + status.slice(1));
+        const formattedPrice = p.rent_amount ? Number(p.rent_amount).toLocaleString() : '0';
+        const typeLabel = (p.property_type || 'apartment').replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        // Extract Gallery Images
+        galleryImages = [];
+        if (Array.isArray(p.images) && p.images.length > 0) {
+          p.images.forEach(img => {
+            const u = resolveUrl(img.url || img.image || img.image_url);
+            if (u) galleryImages.push(u);
+          });
+        }
+        if (galleryImages.length === 0) {
+          const raw = p.primary_image || p.image_url || p.image;
+          if (raw) galleryImages.push(resolveUrl(raw));
+        }
+
+        // Build Airbnb Gallery HTML
+        let galleryHTML = '';
+        if (galleryImages.length === 0) {
+          galleryHTML = `
+            <div class="airbnb-gallery">
+              <div class="gallery-grid gallery-single" style="display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #1e293b, #334155); color:#ffffff;">
+                <div style="text-align:center;">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                  <p style="margin-top:0.5rem; font-weight:600;">Photos coming soon for this listing</p>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (galleryImages.length === 1) {
+          galleryHTML = `
+            <div class="airbnb-gallery">
+              <div class="gallery-grid gallery-single">
+                <div class="gallery-main-col" onclick="openLightbox(0)">
+                  <img src="${galleryImages[0]}" alt="${p.title}" />
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          const mainImg = galleryImages[0];
+          const subImages = galleryImages.slice(1, 3);
+          galleryHTML = `
+            <div class="airbnb-gallery">
+              <div class="gallery-grid">
+                <div class="gallery-main-col" onclick="openLightbox(0)">
+                  <img src="${mainImg}" alt="${p.title}" />
+                </div>
+                <div class="gallery-sub-grid">
+                  ${subImages.map((src, i) => `
+                    <div class="gallery-sub-item" onclick="openLightbox(${i + 1})">
+                      <img src="${src}" alt="Preview ${i + 1}" />
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <button class="gallery-photo-btn" onclick="openLightbox(0)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                Show all ${galleryImages.length} photos
+              </button>
+            </div>
+          `;
+        }
+
+        // Landlord Info
+        const landlord = p.landlord || {};
+        const landlordName = [landlord.first_name, landlord.last_name].filter(Boolean).join(' ') || landlord.username || 'Verified Landlord';
+        const landlordInitials = getUserInitials(landlordName);
+        const landlordAvatarBg = getAvatarColor(landlord.username || landlord.email || landlordName);
+        const landlordPhone = landlord.phone || '+254700000000';
+        const cleanPhone = landlordPhone.replace(/[^0-9]/g, '');
+
+        propertyContent.innerHTML = `
+          <!-- Header -->
+          <div class="detail-header">
+            <h1 class="detail-title">${p.title || 'Student Accommodation'}</h1>
+            <div class="detail-meta-row">
+              <span class="meta-badge ${status}">${statusLabel}</span>
+              <div class="meta-loc">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>${p.location || 'Kilifi, Kenya'}</span>
+              </div>
+              <span>•</span>
+              <span style="color:#10b981; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Verified Student Housing
+              </span>
+            </div>
+          </div>
+
+          <!-- Airbnb Multi-Photo Showcase -->
+          ${galleryHTML}
+
+          <!-- Two Column Body -->
+          <div class="detail-body-grid">
+            <!-- Left Info -->
+            <div class="detail-left-col">
+              <!-- Specs Strip -->
+              <div class="specs-strip">
+                <div class="spec-box">
+                  <span class="spec-box-label">Bedrooms</span>
+                  <span class="spec-box-val">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"></path></svg>
+                    ${p.bedrooms || 1} Bed${p.bedrooms == 1 ? '' : 's'}
+                  </span>
+                </div>
+                <div class="spec-box">
+                  <span class="spec-box-label">Bathrooms</span>
+                  <span class="spec-box-val">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h6M12 6v6M4 12h16a2 2 0 0 1 2 2v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2a2 2 0 0 1 2-2z"></path></svg>
+                    ${p.bathrooms || 1} Bath
+                  </span>
+                </div>
+                <div class="spec-box">
+                  <span class="spec-box-label">Property Type</span>
+                  <span class="spec-box-val">${typeLabel}</span>
+                </div>
+                <div class="spec-box">
+                  <span class="spec-box-label">Status</span>
+                  <span class="spec-box-val" style="color:#10b981;">${statusLabel}</span>
+                </div>
+              </div>
+
+              <!-- Landlord Host Card -->
+              <div class="section-card">
+                <h3>Host &amp; Landlord</h3>
+                <div class="host-card">
+                  <div class="host-avatar" style="background:${landlordAvatarBg};">${landlordInitials}</div>
+                  <div class="host-meta">
+                    <div class="host-name">
+                      <span>${landlordName}</span>
+                      <span style="background:rgba(16,185,129,0.15); color:#10b981; font-size:0.72rem; padding:2px 7px; border-radius:999px;">Verified Host</span>
+                    </div>
+                    <div class="host-role">Listed on NyumbaHub • Responsive landlord</div>
+                    <div class="host-contact-links">
+                      <a href="https://wa.me/${cleanPhone}?text=Hello%20${encodeURIComponent(landlordName)},%20I%20am%20interested%20in%20your%20listing%20'${encodeURIComponent(p.title)}'%20on%20NyumbaHub." target="_blank" class="btn-contact btn-whatsapp">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                        WhatsApp Host
+                      </a>
+                      <a href="tel:${landlordPhone}" class="btn-contact btn-phone">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        Call
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="section-card">
+                <h3>About this accommodation</h3>
+                <p style="color:var(--text-secondary); line-height:1.7; white-space:pre-line;">
+                  ${p.description || 'No detailed description provided for this listing yet. Contact the landlord directly to schedule a viewing.'}
+                </p>
+              </div>
+
+              <!-- Student Amenities -->
+              <div class="section-card">
+                <h3>Included Amenities &amp; Perks</h3>
+                <div class="amenities-grid">
+                  <div class="amenity-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                    <span>High-Speed WiFi</span>
+                  </div>
+                  <div class="amenity-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    <span>24/7 Running Water</span>
+                  </div>
+                  <div class="amenity-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Prepaid Token Power</span>
+                  </div>
+                  <div class="amenity-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Gated &amp; Secure Compound</span>
+                  </div>
+                  <div class="amenity-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                    <span>Self-Contained Bath</span>
+                  </div>
+                  <div class="amenity-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <span>Close to Campus</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Sticky Booking Card -->
+            <div class="booking-sidebar">
+              <div class="booking-price-header">
+                <div>
+                  <span class="booking-price-val">KES ${formattedPrice}</span>
+                  <span class="booking-price-cycle">/ month</span>
+                </div>
+                <span class="meta-badge ${status}">${statusLabel}</span>
+              </div>
+
+              <div class="booking-cost-breakdown">
+                <div class="cost-row">
+                  <span>Monthly Rent</span>
+                  <span style="font-weight:600; color:var(--text-primary);">KES ${formattedPrice}</span>
+                </div>
+                <div class="cost-row">
+                  <span>Refundable Deposit</span>
+                  <span style="font-weight:600; color:var(--text-primary);">KES ${formattedPrice}</span>
+                </div>
+                <div class="cost-row cost-total">
+                  <span>Total Move-in Estimate</span>
+                  <span style="color:var(--brand-primary); font-size:1.05rem;">KES ${(Number(p.rent_amount || 0) * 2).toLocaleString()}</span>
+                </div>
+              </div>
+
+              <button class="btn-reserve" onclick="openPaymentModal(${p.rent_amount || 0})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                <span>Reserve via M-Pesa</span>
+              </button>
+
+              <button class="btn-inquire" onclick="window.open('https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(landlordName)},%20I%20would%20like%20to%20inquire%20about%20${encodeURIComponent(p.title)}', '_blank')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Inquire on WhatsApp</span>
+              </button>
+
+              <div class="safety-callout">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span><strong>NyumbaHub Verified Protection</strong>: Never send money outside the official agreement. Contact campus housing if any discrepancies occur.</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Lightbox Functions
+      window.openLightbox = function(idx) {
+        if (!galleryImages || galleryImages.length === 0) return;
+        currentLightboxIdx = idx;
+        const modal = document.getElementById('lightboxModal');
+        const img = document.getElementById('lightboxImg');
+        const counter = document.getElementById('lightboxCounter');
+        img.src = galleryImages[currentLightboxIdx];
+        counter.textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
+        modal.style.display = 'flex';
+      };
+
+      window.closeLightbox = function(e) {
+        if (!e || e.target.id === 'lightboxModal' || e.target.classList.contains('lightbox-close-btn')) {
+          document.getElementById('lightboxModal').style.display = 'none';
+        }
+      };
+
+      window.prevLightboxImage = function(e) {
+        if (e) e.stopPropagation();
+        if (galleryImages.length <= 1) return;
+        currentLightboxIdx = (currentLightboxIdx - 1 + galleryImages.length) % galleryImages.length;
+        document.getElementById('lightboxImg').src = galleryImages[currentLightboxIdx];
+        document.getElementById('lightboxCounter').textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
+      };
+
+      window.nextLightboxImage = function(e) {
+        if (e) e.stopPropagation();
+        if (galleryImages.length <= 1) return;
+        currentLightboxIdx = (currentLightboxIdx + 1) % galleryImages.length;
+        document.getElementById('lightboxImg').src = galleryImages[currentLightboxIdx];
+        document.getElementById('lightboxCounter').textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
+      };
+
+      // Payment Modal Functions
+      window.openPaymentModal = function(amount) {
+        const modal = document.getElementById('paymentModal');
+        document.getElementById('mpesaAmount').value = amount;
+        modal.style.display = 'flex';
+      };
+
+      window.closePaymentModal = function() {
+        document.getElementById('paymentModal').style.display = 'none';
+      };
+
+      window.submitMpesaPayment = async function() {
+        const phone = document.getElementById('mpesaPhone').value.trim();
+        const amount = document.getElementById('mpesaAmount').value.trim();
+        const feedback = document.getElementById('paymentFeedback');
+        const btn = document.getElementById('btnConfirmPay');
+
+        if (!phone) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.textContent = 'Please enter a valid phone number.';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Initiating STK Push...';
+        feedback.style.display = 'block';
+        feedback.style.color = 'var(--text-secondary)';
+        feedback.textContent = 'Connecting to Safaricom Daraja gateway...';
+
+        try {
+          const res = await fetch(`${getApiBase()}/api/properties/pay/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, amount })
+          });
+          const data = await res.json();
+          feedback.style.color = '#10b981';
+          feedback.textContent = data.message || 'Payment prompt sent! Please enter your M-Pesa PIN on your phone.';
+          btn.textContent = 'Prompt Sent!';
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = 'Send M-Pesa Prompt';
+          }, 4000);
+        } catch (err) {
+          feedback.style.color = '#ef4444';
+          feedback.textContent = 'Payment initiation error. Please try again.';
+          btn.disabled = false;
+          btn.textContent = 'Send M-Pesa Prompt';
+        }
+      };
+
+      // Save / Heart Logic
+      function getSavedIds() {
+        try {
+          return JSON.parse(localStorage.getItem('nyumba_saved_properties') || '[]');
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function updateSavedButtonState(id) {
+        const saved = getSavedIds();
+        const isSaved = saved.includes(Number(id));
+        const btn = document.getElementById('saveListingBtn');
+        const heart = document.getElementById('saveListingHeart');
+        const text = document.getElementById('saveListingText');
+        if (btn) btn.classList.toggle('saved', isSaved);
+        if (heart) heart.setAttribute('fill', isSaved ? 'currentColor' : 'none');
+        if (text) text.textContent = isSaved ? 'Saved' : 'Save';
+      }
+
+      window.toggleSaveCurrentListing = function() {
+        if (!currentProperty) return;
+        const id = Number(currentProperty.id);
+        let saved = getSavedIds();
+        const idx = saved.indexOf(id);
+        let isNowSaved = false;
+        if (idx > -1) {
+          saved.splice(idx, 1);
+          isNowSaved = false;
+        } else {
+          saved.push(id);
+          isNowSaved = true;
+        }
+        localStorage.setItem('nyumba_saved_properties', JSON.stringify(saved));
+        updateSavedButtonState(id);
+      };
+
+      window.shareListing = function() {
+        if (navigator.share) {
+          navigator.share({
+            title: currentProperty ? currentProperty.title : 'NyumbaHub Property',
+            url: window.location.href
+          }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(window.location.href);
+          alert('Listing link copied to clipboard!');
+        }
+      };
+
+      window.PageInitializers = window.PageInitializers || {};
+      window.PageInitializers['property-detail'] = initPropertyDetailPage;
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPropertyDetailPage);
+      } else {
+        initPropertyDetailPage();
+      }
+    })();
+    </script>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="js/htmx.min.js"></script>
+  <script src="js/head-support.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="theme.js"></script>
+  <script src="auth.js"></script>
+</body>
+
+</html>

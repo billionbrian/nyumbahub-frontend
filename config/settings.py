@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'django_filters',
     'accounts',
     'properties',
 ]
@@ -130,6 +132,10 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Media files (User uploaded property images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
@@ -137,7 +143,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ),
 }
 
@@ -170,6 +176,17 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
 ]
-
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_CREDENTIALS = True
+
+# Geocoding Service Settings
+GEOCODING_PROVIDER = 'nominatim'
+GEOCODING_NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse'
+GEOCODING_NOMINATIM_USER_AGENT = 'NyumbaHub-StudentHousing/1.0 (admin@nyumbahub.test)'
+GEOCODING_TIMEOUT_SECONDS = 5
+

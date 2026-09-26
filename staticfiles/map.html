@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Housing Map | NyumbaHub</title>
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="styles/global-ui.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Map Layout Container scoped to Map Page */
+    .content-swap[data-page="map"] {
+      padding-top: 72px;
+      padding-bottom: 0;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .map-layout {
+      flex: 1;
+      display: flex;
+      margin-top: 0;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Left Side Rail (Desktop) */
+    .map-side-rail {
+      width: 440px;
+      max-width: 38vw;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
+      flex-shrink: 0;
+    }
+
+    .rail-top-search {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+    }
+
+    .rail-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .rail-search-bar input {
+      width: 100%;
+      padding: 10px 16px 10px 38px;
+      border: 1.5px solid var(--input-border);
+      border-radius: 20px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .rail-search-bar input:focus {
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 3px rgba(255, 180, 0, 0.15);
+    }
+
+    .rail-search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .rail-filter-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .rail-filter-chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .rail-chip {
+      padding: 5px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .rail-chip.active,
+    .rail-chip:hover {
+      background: var(--brand-primary);
+      color: #111827;
+      border-color: var(--brand-primary);
+      font-weight: 600;
+    }
+
+    .rail-content-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rail-header-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      padding: 0 2px 2px;
+    }
+
+    .rail-property-card {
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-small);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .rail-property-card:hover,
+    .rail-property-card.active {
+      border-color: var(--brand-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .rail-card-img {
+      width: 90px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--bg-tertiary);
+    }
+
+    .rail-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .rail-card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rail-card-location {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rail-card-meta {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rail-card-price {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+    }
+
+    .has-no-coords-badge {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text-secondary);
+      border-radius: 4px;
+      margin-left: auto;
+    }
+
+    /* Main Full-Screen Map Viewport */
+    .map-viewport {
+      flex: 1;
+      position: relative;
+      background: var(--bg-primary);
+      overflow: hidden;
+    }
+
+    #propertyLeafletMap {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Map Layer Switcher (Google Maps Style) */
+    .map-layer-switcher {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      display: flex;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+    }
+
+    .layer-switch-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .layer-switch-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .layer-switch-btn.active {
+      background: var(--brand-primary);
+      color: #111827;
+    }
+
+    /* Floating Map Controls */
+    .map-controls-group {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .map-control-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      transition: all 0.2s ease;
+    }
+
+    .map-control-btn:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+    }
+
+    /* Floating Toast / Status Overlay */
+    .map-status-toast {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      border: 1px solid var(--brand-primary);
+      color: var(--text-primary);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      animation: fadeInToast 0.3s ease;
+    }
+
+    @keyframes fadeInToast {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* Custom Leaflet Map Pins */
+    .custom-property-pin {
+      background: var(--card-bg, #ffffff);
+      color: var(--text-primary, #111827);
+      border: 2px solid var(--brand-primary, #ffb400);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-weight: 700;
+      font-size: 11px;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
+    }
+
+    .custom-property-pin:hover,
+    .custom-property-pin.pin-active {
+      background: var(--brand-primary, #ffb400);
+      color: #111827;
+      transform: scale(1.15);
+      z-index: 99999 !important;
+    }
+
+    .custom-property-pin::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px 5px 0;
+      border-style: solid;
+      border-color: var(--brand-primary, #ffb400) transparent transparent;
+    }
+
+    /* User GPS Pulse Marker */
+    .user-gps-pulse {
+      width: 18px;
+      height: 18px;
+      background: #2563eb;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4);
+      animation: gpsPulse 2s infinite;
+    }
+
+    @keyframes gpsPulse {
+      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+      70% { box-shadow: 0 0 0 16px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    /* Custom Leaflet Popup Styling */
+    .leaflet-popup-content-wrapper {
+      background: var(--card-bg, #1e293b) !important;
+      color: var(--text-primary, #ffffff) !important;
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      border-radius: 14px !important;
+      padding: 0 !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35) !important;
+      overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+      line-height: 1.4 !important;
+      min-width: 220px;
+      max-width: 280px;
+    }
+
+    .leaflet-popup-tip {
+      background: var(--card-bg, #1e293b) !important;
+    }
+
+    .leaflet-container a.leaflet-popup-close-button {
+      color: #ffffff !important;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border: none;
+    }
+
+    .map-popup-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-popup-thumb {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      background: var(--bg-tertiary, #334155);
+    }
+
+    .map-popup-info {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .map-popup-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .map-popup-loc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .map-popup-meta {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+    }
+
+    .map-popup-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .map-popup-price {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--brand-primary);
+    }
+
+    .map-popup-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background: var(--brand-primary);
+      color: #111827 !important;
+      font-weight: 600;
+      font-size: 0.78rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .map-popup-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Mobile toggle button */
+    .mobile-rail-toggle {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      padding: 10px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--brand-primary);
+      border-radius: 999px;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      cursor: pointer;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .content-swap[data-page="map"] {
+        padding-top: 64px;
+        padding-bottom: 60px;
+        height: 100vh;
+        height: 100dvh;
+      }
+
+      .map-layout {
+        margin-top: 0;
+        height: 100%;
+        position: relative;
+      }
+
+      .map-side-rail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 100%;
+        z-index: 2000;
+        display: none;
+      }
+
+      .map-side-rail.mobile-open {
+        display: flex;
+      }
+
+      .mobile-rail-toggle {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+
+<body hx-ext="head-support">
+  <div id="navbar"></div>
+
+  <div id="content-swap" class="content-swap" data-page="map" hx-target="#content-swap" hx-select="#content-swap" hx-swap="outerHTML show:window:top" hx-push-url="true">
+    <main class="map-layout">
+      <!-- Desktop Left Side Rail for Filters & Property Detail Cards -->
+      <aside class="map-side-rail" id="mapSideRail" aria-label="Properties Map Rail">
+        <div class="rail-top-search">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">Search Properties</span>
+            <button class="rail-chip" id="closeMobileRailBtn" style="display:none;" onclick="toggleMobileRail()">Close ✕</button>
+          </div>
+          <div class="rail-search-bar">
+            <span class="rail-search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
+            <input type="text" id="railSearchInput" placeholder="Search by title or location..." />
+          </div>
+          <div class="rail-filter-chips">
+            <button class="rail-chip active" data-filter="all">All Units</button>
+            <button class="rail-chip" data-filter="bedsitter">Bedsitter</button>
+            <button class="rail-chip" data-filter="one_bedroom">1 Bed</button>
+            <button class="rail-chip" data-filter="two_bedroom">2 Bed</button>
+            <button class="rail-chip" data-filter="price_15k">&lt; KES 15K</button>
+          </div>
+        </div>
+
+        <div class="rail-content-list" id="railContentList">
+          <div class="rail-header-status">
+            <span id="railCountStatus">Loading properties...</span>
+            <span id="railPinCount">0 on map</span>
+          </div>
+
+          <!-- Dynamic Cards Container -->
+          <div id="railCardsWrap" style="display:flex; flex-direction:column; gap:10px;">
+            <div style="text-align:center; padding: 2rem 1rem; color:var(--text-secondary); font-size:0.88rem;">
+              Fetching student listings...
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Map Viewport -->
+      <div class="map-viewport" id="mapViewport">
+        <!-- Live Leaflet Map Canvas -->
+        <div id="propertyLeafletMap"></div>
+
+        <!-- Satellite / Street Map Toggle (Google Maps Style) -->
+        <div class="map-layer-switcher" id="mapLayerSwitcher">
+          <button type="button" class="layer-switch-btn active" id="btnLayerStreet" title="Standard Street Map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <span>Map</span>
+          </button>
+          <button type="button" class="layer-switch-btn" id="btnLayerSatellite" title="Satellite Imagery with Street Labels (Google Maps Hybrid)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            <span>Satellite</span>
+          </button>
+        </div>
+
+        <!-- Floating Map Controls -->
+        <div class="map-controls-group">
+          <button class="map-control-btn" id="mapZoomIn" title="Zoom In" aria-label="Zoom In">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <button class="map-control-btn" id="mapZoomOut" title="Zoom Out" aria-label="Zoom Out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <button class="map-control-btn" id="mapLocateMe" title="Use My Current Location" aria-label="Use My Current Location">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="22" y1="12" x2="18" y2="12"></line>
+              <line x1="6" y1="12" x2="2" y2="12"></line>
+              <line x1="12" y1="6" x2="12" y2="2"></line>
+              <line x1="12" y1="22" x2="12" y2="18"></line>
+            </svg>
+          </button>
+          <button class="map-control-btn" id="mapFitAll" title="Fit All Properties" aria-label="Fit All Properties">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <polyline points="9 21 3 21 3 15"></polyline>
+              <line x1="21" y1="3" x2="14" y2="10"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile Rail Drawer Trigger -->
+        <button class="mobile-rail-toggle" id="mobileRailToggle" onclick="toggleMobileRail()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span id="mobileRailToggleText">Listings (0)</span>
+        </button>
+
+        <!-- Floating Toast Notice -->
+        <div id="mapStatusToast" class="map-status-toast" style="display:none;"></div>
+      </div>
+    </main>
+
+    <script>
+      (function() {
+        function getApiBase() {
+          if (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port)) {
+            return window.location.origin;
+          }
+          return 'http://localhost:8080';
+        }
+
+        let mapInstance = null;
+        let markersGroup = null;
+        let userGpsMarker = null;
+        let allProperties = [];
+        let markerMap = {};
+        let activeFilter = 'all';
+        let searchQuery = '';
+
+        function showMapToast(msg, duration = 3000) {
+          const toast = document.getElementById('mapStatusToast');
+          if (!toast) return;
+          toast.textContent = msg;
+          toast.style.display = 'flex';
+          clearTimeout(toast._timeout);
+          toast._timeout = setTimeout(() => {
+            toast.style.display = 'none';
+          }, duration);
+        }
+
+        window.toggleMobileRail = function() {
+          const rail = document.getElementById('mapSideRail');
+          const closeBtn = document.getElementById('closeMobileRailBtn');
+          if (!rail) return;
+          rail.classList.toggle('mobile-open');
+          if (closeBtn) closeBtn.style.display = rail.classList.contains('mobile-open') ? 'block' : 'none';
+        };
+
+        function getPropertyThumb(p) {
+          if (p.image) return p.image;
+          if (p.images && p.images.length > 0) return p.images[0].image || p.images[0];
+          const defaults = [
+            'pexels-asphotograpy-101808.jpg',
+            'pexels-expect-best-79873-323780.jpg',
+            'pexels-binyaminmellish-106399.jpg',
+            'pexels-binyaminmellish-186077.jpg'
+          ];
+          return defaults[(p.id || 0) % defaults.length];
+        }
+
+        function ensureLeaflet(callback) {
+          if (typeof L !== 'undefined') {
+            callback();
+            return;
+          }
+          if (!document.getElementById('leaflet-css')) {
+            const link = document.createElement('link');
+            link.id = 'leaflet-css';
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+          }
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          script.onload = () => callback();
+          document.head.appendChild(script);
+        }
+
+        function createPinIcon(p) {
+          const rent = p.rent_amount ? Number(p.rent_amount) : 0;
+          let label = 'KES ' + (rent >= 1000 ? Math.round(rent / 1000) + 'K' : rent);
+          return L.divIcon({
+            className: '',
+            html: `<div class="custom-property-pin" data-marker-id="${p.id}">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                    <span>${label}</span>
+                   </div>`,
+            iconSize: [60, 28],
+            iconAnchor: [30, 28],
+            popupAnchor: [0, -28]
+          });
+        }
+
+        function createPopupContent(p) {
+          const thumb = getPropertyThumb(p);
+          const rentFormatted = p.rent_amount ? Number(p.rent_amount).toLocaleString() : 'N/A';
+          const typeFormatted = (p.property_type || 'rental').replace('_', ' ').toUpperCase();
+          const locationFormatted = p.location || 'Location details pending';
+
+          return `
+            <div class="map-popup-card">
+              <img src="${thumb}" alt="${p.title}" class="map-popup-thumb" onerror="this.src='pexels-asphotograpy-101808.jpg'" />
+              <div class="map-popup-info">
+                <h4 class="map-popup-title">${p.title || 'Untitled Listing'}</h4>
+                <div class="map-popup-loc">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span>${locationFormatted}</span>
+                </div>
+                <div class="map-popup-meta">
+                  ${p.bedrooms || 1} Bed • ${p.bathrooms || 1} Bath • ${typeFormatted}
+                </div>
+                <div class="map-popup-footer">
+                  <div class="map-popup-price">KES ${rentFormatted}<span style="font-size:0.7rem; color:var(--text-secondary); font-weight:normal;"> /mo</span></div>
+                  <a href="property-detail.html?id=${p.id}" class="map-popup-btn">
+                    <span>View</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        function matchesFilters(p) {
+          // Search query check
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const matchTitle = (p.title || '').toLowerCase().includes(q);
+            const matchLoc = (p.location || '').toLowerCase().includes(q);
+            const matchDesc = (p.description || '').toLowerCase().includes(q);
+            if (!matchTitle && !matchLoc && !matchDesc) return false;
+          }
+
+          // Chip filter check
+          if (activeFilter === 'all') return true;
+          if (activeFilter === 'bedsitter') return (p.property_type || '').toLowerCase() === 'bedsitter';
+          if (activeFilter === 'one_bedroom') return (p.property_type || '').toLowerCase() === 'one_bedroom' || p.bedrooms === 1;
+          if (activeFilter === 'two_bedroom') return (p.property_type || '').toLowerCase() === 'two_bedroom' || p.bedrooms === 2;
+          if (activeFilter === 'price_15k') return Number(p.rent_amount || 0) <= 15000;
+
+          return true;
+        }
+
+        function renderRailCards(filtered) {
+          const wrap = document.getElementById('railCardsWrap');
+          const countStatus = document.getElementById('railCountStatus');
+          const pinCount = document.getElementById('railPinCount');
+          const mobileText = document.getElementById('mobileRailToggleText');
+
+          if (!wrap) return;
+
+          let plottedCount = 0;
+          filtered.forEach(p => {
+            if (p.latitude != null && p.longitude != null && !isNaN(parseFloat(p.latitude)) && !isNaN(parseFloat(p.longitude))) {
+              plottedCount++;
+            }
+          });
+
+          if (countStatus) countStatus.textContent = `${filtered.length} Accommodations`;
+          if (pinCount) pinCount.textContent = `${plottedCount} mapped`;
+          if (mobileText) mobileText.textContent = `Listings (${filtered.length})`;
+
+          if (filtered.length === 0) {
+            wrap.innerHTML = `
+              <div style="text-align:center; padding: 2.5rem 1rem; color:var(--text-secondary);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.6;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <p style="font-size:0.9rem; font-weight:600;">No properties found</p>
+                <p style="font-size:0.78rem; margin-top:4px;">Try adjusting your search terms or filters.</p>
+              </div>
+            `;
+            return;
+          }
+
+          wrap.innerHTML = filtered.map(p => {
+            const thumb = getPropertyThumb(p);
+            const rent = p.rent_amount ? Number(p.rent_amount).toLocaleString() : 'N/A';
+            const hasCoords = p.latitude != null && p.longitude != null && !isNaN(parseFloat(p.latitude)) && !isNaN(parseFloat(p.longitude));
+            const badge = hasCoords ? '' : '<span class="has-no-coords-badge">No pin</span>';
+
+            return `
+              <div class="rail-property-card" data-prop-id="${p.id}" onclick="window.focusPropertyOnMap(${p.id})">
+                <img src="${thumb}" alt="${p.title}" class="rail-card-img" onerror="this.src='pexels-asphotograpy-101808.jpg'" />
+                <div class="rail-card-body">
+                  <h4 class="rail-card-title">${p.title || 'Untitled Property'}</h4>
+                  <div class="rail-card-location">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>${p.location || 'Location pending'}</span>
+                  </div>
+                  <div class="rail-card-meta">
+                    <span>${p.bedrooms || 1} Bed • ${p.bathrooms || 1} Bath</span>
+                    ${badge}
+                  </div>
+                  <div class="rail-card-price">KES ${rent}<span style="font-size:0.75rem; color:var(--text-secondary); font-weight:normal;"> /mo</span></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        function updateMapMarkers() {
+          if (!mapInstance || !markersGroup) return;
+
+          markersGroup.clearLayers();
+          markerMap = {};
+
+          const filtered = allProperties.filter(matchesFilters);
+          renderRailCards(filtered);
+
+          const validBounds = [];
+
+          filtered.forEach(p => {
+            if (p.latitude != null && p.longitude != null && !isNaN(parseFloat(p.latitude)) && !isNaN(parseFloat(p.longitude))) {
+              const lat = parseFloat(p.latitude);
+              const lon = parseFloat(p.longitude);
+
+              const marker = L.marker([lat, lon], {
+                icon: createPinIcon(p),
+                title: p.title || 'Property'
+              });
+
+              marker.bindPopup(createPopupContent(p), {
+                maxWidth: 280,
+                className: 'custom-leaflet-popup'
+              });
+
+              marker.on('click', () => {
+                // Highlight card in rail
+                document.querySelectorAll('.rail-property-card').forEach(c => c.classList.remove('active'));
+                const card = document.querySelector(`.rail-property-card[data-prop-id="${p.id}"]`);
+                if (card) {
+                  card.classList.add('active');
+                  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+              });
+
+              markersGroup.addLayer(marker);
+              markerMap[p.id] = marker;
+              validBounds.push([lat, lon]);
+            }
+          });
+
+          if (validBounds.length > 0) {
+            mapInstance.fitBounds(L.latLngBounds(validBounds).pad(0.15), { maxZoom: 15 });
+          }
+        }
+
+        window.focusPropertyOnMap = function(id) {
+          const marker = markerMap[id];
+          if (marker) {
+            const latLng = marker.getLatLng();
+            mapInstance.flyTo(latLng, Math.max(mapInstance.getZoom(), 15), { duration: 0.8 });
+            setTimeout(() => {
+              marker.openPopup();
+            }, 300);
+
+            // On mobile, close rail if open
+            const rail = document.getElementById('mapSideRail');
+            if (rail && rail.classList.contains('mobile-open')) {
+              toggleMobileRail();
+            }
+          } else {
+            showMapToast('Exact map pin coordinates not available for this listing.');
+          }
+
+          document.querySelectorAll('.rail-property-card').forEach(c => c.classList.remove('active'));
+          const card = document.querySelector(`.rail-property-card[data-prop-id="${id}"]`);
+          if (card) card.classList.add('active');
+        };
+
+        async function fetchProperties() {
+          try {
+            const res = await fetch(`${getApiBase()}/api/properties/?page_size=100`);
+            if (res.ok) {
+              const data = await res.json();
+              allProperties = data.results || (Array.isArray(data) ? data : []);
+            } else {
+              allProperties = [];
+            }
+          } catch (err) {
+            console.error('Failed to fetch properties for map:', err);
+            allProperties = [];
+          }
+          updateMapMarkers();
+        }
+
+        function initMapPage() {
+          ensureLeaflet(() => {
+            const container = document.getElementById('propertyLeafletMap');
+            if (!container) return;
+
+            // Remove existing instance if HTMX swapped
+            if (mapInstance) {
+              try { mapInstance.remove(); } catch (e) {}
+              mapInstance = null;
+            }
+
+            // Default center: Kilifi / Coast (-3.6305, 39.8499)
+            mapInstance = L.map('propertyLeafletMap', {
+              zoomControl: false,
+              center: [-3.6305, 39.8499],
+              zoom: 12
+            });
+
+            // Tile Layer Definitions (No API key required, zero watermarks)
+            // 1. Google Streets (Standard clean Google Map)
+            const googleStreetsLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+              maxZoom: 20,
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+              attribution: 'Map data © Google'
+            });
+
+            // 2. Google Satellite Hybrid (Crisp satellite photo imagery with roads and labels)
+            const googleSatelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+              maxZoom: 20,
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+              attribution: 'Imagery © Google'
+            });
+
+            // 3. Esri World Street Map (Alternative street layer, 100% free with no API key)
+            const esriStreetLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+              maxZoom: 19,
+              attribution: 'Tiles © Esri'
+            });
+
+            // 4. Esri World Imagery (Alternative satellite layer, 100% free with no API key)
+            const esriSatelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+              maxZoom: 19,
+              attribution: 'Tiles © Esri'
+            });
+
+            // Default to Google Streets
+            let currentBaseLayer = googleStreetsLayer;
+            googleStreetsLayer.addTo(mapInstance);
+
+            const btnLayerStreet = document.getElementById('btnLayerStreet');
+            const btnLayerSatellite = document.getElementById('btnLayerSatellite');
+
+            function switchMapLayer(layerType) {
+              if (layerType === 'satellite') {
+                if (mapInstance.hasLayer(googleStreetsLayer)) mapInstance.removeLayer(googleStreetsLayer);
+                if (mapInstance.hasLayer(esriStreetLayer)) mapInstance.removeLayer(esriStreetLayer);
+                if (mapInstance.hasLayer(esriSatelliteLayer)) mapInstance.removeLayer(esriSatelliteLayer);
+                googleSatelliteLayer.addTo(mapInstance);
+                currentBaseLayer = googleSatelliteLayer;
+                if (btnLayerSatellite) btnLayerSatellite.classList.add('active');
+                if (btnLayerStreet) btnLayerStreet.classList.remove('active');
+                showMapToast('Switched to Satellite View');
+              } else {
+                if (mapInstance.hasLayer(googleSatelliteLayer)) mapInstance.removeLayer(googleSatelliteLayer);
+                if (mapInstance.hasLayer(esriSatelliteLayer)) mapInstance.removeLayer(esriSatelliteLayer);
+                googleStreetsLayer.addTo(mapInstance);
+                currentBaseLayer = googleStreetsLayer;
+                if (btnLayerStreet) btnLayerStreet.classList.add('active');
+                if (btnLayerSatellite) btnLayerSatellite.classList.remove('active');
+                showMapToast('Switched to Street Map');
+              }
+            }
+
+            if (btnLayerStreet) btnLayerStreet.onclick = () => switchMapLayer('street');
+            if (btnLayerSatellite) btnLayerSatellite.onclick = () => switchMapLayer('satellite');
+
+            // Built-in Leaflet Layers Control
+            L.control.layers({
+              "Google Street Map": googleStreetsLayer,
+              "Google Satellite (Hybrid)": googleSatelliteLayer,
+              "Esri Street Map": esriStreetLayer,
+              "Esri Satellite": esriSatelliteLayer
+            }, null, { position: 'bottomright' }).addTo(mapInstance);
+
+            markersGroup = L.featureGroup().addTo(mapInstance);
+
+            // Setup Floating Controls
+            const btnZoomIn = document.getElementById('mapZoomIn');
+            const btnZoomOut = document.getElementById('mapZoomOut');
+            const btnLocate = document.getElementById('mapLocateMe');
+            const btnFitAll = document.getElementById('mapFitAll');
+
+            if (btnZoomIn) btnZoomIn.onclick = () => mapInstance.zoomIn();
+            if (btnZoomOut) btnZoomOut.onclick = () => mapInstance.zoomOut();
+            if (btnFitAll) {
+              btnFitAll.onclick = () => {
+                if (markersGroup && markersGroup.getLayers().length > 0) {
+                  mapInstance.fitBounds(markersGroup.getBounds().pad(0.15));
+                } else {
+                  showMapToast('No properties to frame.');
+                }
+              };
+            }
+
+            if (btnLocate) {
+              btnLocate.onclick = () => {
+                if (!navigator.geolocation) {
+                  showMapToast('Geolocation is not supported by your browser.');
+                  return;
+                }
+                showMapToast('Acquiring your location...');
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+
+                    if (userGpsMarker) {
+                      userGpsMarker.setLatLng([lat, lon]);
+                    } else {
+                      userGpsMarker = L.marker([lat, lon], {
+                        icon: L.divIcon({
+                          className: '',
+                          html: '<div class="user-gps-pulse"></div>',
+                          iconSize: [18, 18],
+                          iconAnchor: [9, 9]
+                        })
+                      }).addTo(mapInstance);
+                      userGpsMarker.bindPopup('<strong>Your Current Location</strong>');
+                    }
+
+                    mapInstance.flyTo([lat, lon], 15, { duration: 1 });
+                    showMapToast('Centered on your location');
+                  },
+                  (err) => {
+                    if (err.code === 1) {
+                      showMapToast('Location permission denied.');
+                    } else if (err.code === 2) {
+                      showMapToast('Location unavailable.');
+                    } else {
+                      showMapToast('Location request timed out.');
+                    }
+                  },
+                  { enableHighAccuracy: true, timeout: 8000 }
+                );
+              };
+            }
+
+            // Search bar
+            const searchInput = document.getElementById('railSearchInput');
+            if (searchInput) {
+              searchInput.oninput = (e) => {
+                searchQuery = e.target.value.trim();
+                updateMapMarkers();
+              };
+            }
+
+            // Filter chips
+            const chips = document.querySelectorAll('.rail-chip[data-filter]');
+            chips.forEach(chip => {
+              chip.onclick = () => {
+                chips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                activeFilter = chip.dataset.filter || 'all';
+                updateMapMarkers();
+              };
+            });
+
+            // Fetch property data
+            fetchProperties();
+
+            // Refresh map size after layout settles
+            setTimeout(() => {
+              if (mapInstance) mapInstance.invalidateSize();
+            }, 250);
+          });
+        }
+
+        window.PageInitializers = window.PageInitializers || {};
+        window.PageInitializers['map'] = initMapPage;
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMapPage);
+        } else {
+          initMapPage();
+        }
+      })();
+    </script>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/htmx.min.js"></script>
+  <script src="js/head-support.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="theme.js"></script>
+  <script src="auth.js"></script>
+</body>
+
+</html>

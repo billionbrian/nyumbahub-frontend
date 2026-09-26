@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Terms of Service - NyumbaHub Real Estate Platform" />
   <title>Terms of Service - NyumbaHub</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="styles/global-ui.css">
 
   <style>
     /* ======= RESET ======= */
@@ -40,26 +42,25 @@
       z-index: -1;
     }
 
-    /* ======= HEADER ======= */
-    header {
+    /* ======= HERO ======= */
+    .page-hero {
       text-align: center;
-      padding: 80px 20px 40px;
-      backdrop-filter: blur(8px);
+      padding: 30px 20px 25px;
     }
 
-    header h1 {
-      font-size: 2.8em;
+    .page-hero h1 {
+      font-size: clamp(2rem, 5vw, 2.8em);
       color: #00e1a3;
       text-shadow: 0 0 12px rgba(0, 225, 163, 0.5);
       letter-spacing: 1px;
       animation: fadeDown 1s ease-out;
     }
 
-    header p {
+    .page-hero p {
       color: #dcdcdc;
       margin-top: 10px;
-      font-size: 1.1em;
-      opacity: 0.8;
+      font-size: 1.05em;
+      opacity: 0.85;
       animation: fadeIn 1.5s ease-out;
     }
 
@@ -77,14 +78,9 @@
 
     section {
       margin-bottom: 45px;
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.5s ease;
-    }
-
-    section.visible {
       opacity: 1;
-      transform: translateY(0);
+      transform: none;
+      transition: all 0.5s ease;
     }
 
     h2 {
@@ -173,14 +169,17 @@
   </style>
 </head>
 
-<body>
-  <header>
+<body hx-ext="head-support">
+  <div id="navbar"></div>
+
+  <div id="content-swap" class="content-swap" data-page="terms" hx-target="#content-swap" hx-select="#content-swap" hx-swap="outerHTML show:window:top" hx-push-url="true">
+  <main>
+  <section class="page-hero">
     <h1>Terms of Service</h1>
     <p>Understanding your rights and responsibilities while using NyumbaHub.</p>
-  </header>
+  </section>
 
-  <main>
-    <section>
+  <section>
       <h2>1. Acceptance of Terms</h2>
       <p>By accessing or using NyumbaHub, you agree to abide by these Terms of Service. If you do not agree, please
         refrain from using our platform.</p>
@@ -218,27 +217,43 @@
 
     <section>
       <h2>7. Contact Us</h2>
-      <p>If you have questions about these Terms, please <a href="contact.html">contact our support team</a>.</p>
+      <p>If you have questions about these Terms, please <a href="contact.html" hx-get="contact.html">contact our support team</a>.</p>
     </section>
   </main>
 
-  <footer>
-    <p>&copy; 2026 NyumbaHub. All rights reserved.</p>
-  </footer>
-
   <script>
-    // Reveal on scroll
-    const sections = document.querySelectorAll("section");
-    function revealOnScroll() {
-      const windowHeight = window.innerHeight;
-      sections.forEach(sec => {
-        const top = sec.getBoundingClientRect().top;
-        if (top < windowHeight - 100) sec.classList.add("visible");
-      });
+  (function() {
+    function initTermsPage() {
+      const sections = document.querySelectorAll('main section');
+      function revealOnScroll() {
+        const windowHeight = window.innerHeight;
+        sections.forEach(sec => {
+          if (sec.getBoundingClientRect().top < windowHeight - 100) sec.classList.add('visible');
+        });
+      }
+      window.addEventListener('scroll', revealOnScroll);
+      revealOnScroll();
     }
-    window.addEventListener("scroll", revealOnScroll);
-    revealOnScroll();
+
+    window.PageInitializers = window.PageInitializers || {};
+    window.PageInitializers['terms'] = initTermsPage;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTermsPage);
+    } else {
+      initTermsPage();
+    }
+  })();
   </script>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="js/htmx.min.js"></script>
+  <script src="js/head-support.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="theme.js"></script>
+  <script src="auth.js"></script>
 </body>
 
 </html>

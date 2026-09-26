@@ -7,57 +7,12 @@
 }
 
 body {
-  background-color: #111;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   overflow-x: hidden;
 }
 
-/* Navbar */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 50px;
-  background: rgba(0, 0, 0, 0.7);
-  position: fixed;
-  width: 100%;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.logo {
-  font-size: 1.8rem;
-  color: #fff;
-  font-weight: 700;
-}
-
-.logo span {
-  color: #ffb400;
-}
-
-nav a {
-  margin: 0 15px;
-  text-decoration: none;
-  color: #ccc;
-  transition: color 0.3s;
-}
-
-nav a:hover,
-nav a.active {
-  color: #ffb400;
-}
-
-.login-btn {
-  background-color: #ffb400;
-  color: #000;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.login-btn:hover {
-  background-color: #fff;
-}
+/* Navbar styles are managed in styles/global-ui.css */
 
 /* Hero Section */
 .hero {
@@ -90,13 +45,13 @@ nav a.active {
 
 .hero-content h2 {
   font-size: 2.8rem;
-  color: #ffb400;
+  color: var(--brand-primary);
   margin-bottom: 20px;
 }
 
 .hero-content p {
   font-size: 1.2rem;
-  color: #eee;
+  color: var(--text-secondary);
   margin-bottom: 30px;
 }
 
@@ -111,14 +66,16 @@ nav a.active {
 .search-bar input,
 .search-bar select {
   padding: 12px;
-  border: none;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   width: 200px;
   outline: none;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .search-bar button {
-  background-color: #ffb400;
+  background-color: var(--brand-primary);
   border: none;
   border-radius: 8px;
   padding: 12px 25px;
@@ -128,7 +85,7 @@ nav a.active {
 }
 
 .search-bar button:hover {
-  background-color: #fff;
+  background-color: var(--brand-hover);
   color: #000;
   transform: scale(1.05);
 }
@@ -158,7 +115,7 @@ nav a.active {
 }
 
 .house-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   margin: 20px auto;
   padding: 20px;
   border-radius: 12px;
@@ -168,12 +125,12 @@ nav a.active {
 }
 
 .house-card:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--card-hover);
   transform: scale(1.05);
 }
 
 .no-results {
-  color: #ffb400;
+  color: var(--brand-primary);
   font-size: 1.1rem;
 }
 
@@ -187,11 +144,11 @@ nav a.active {
 
 /* Footer */
 footer {
-  background: #000;
+  background: var(--footer-bg);
   padding: 30px;
   text-align: center;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--text-secondary);
   margin-top: 40px;
 }
 
@@ -218,15 +175,15 @@ footer {
   }
 }
 .available {
-  background: #28a74533;
-  color: #28a745;
+  background: var(--success-bg);
+  color: var(--success-color);
   padding: 4px 8px;
   border-radius: 6px;
 }
 
 .unavailable {
-  background: #dc354533;
-  color: #dc3545;
+  background: var(--danger-bg);
+  color: var(--danger-color);
   padding: 4px 8px;
   border-radius: 6px;
 }

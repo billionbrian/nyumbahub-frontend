@@ -1,14 +1,46 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+    const loginForm = document.getElementById("loginForm");
+    const alertBox = document.getElementById("authAlert");
+    const submitBtn = document.getElementById("loginSubmitBtn");
+
+    function showAuthMessage(message, type = "error") {
+        if (alertBox) {
+            alertBox.className = `auth-alert ${type}`;
+            alertBox.textContent = message;
+        } else {
+            alert(message);
+        }
+    }
+
+    if (!loginForm) return;
+
+    loginForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const username = document.getElementById("username").value;
+        const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value;
 
-        console.log("Login attempt for username:", username);
+        if (!username || !password) {
+            showAuthMessage("Please enter both your username and password.", "error");
+            return;
+        }
+
+        const originalBtnHTML = submitBtn ? submitBtn.innerHTML : "";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "<span>Signing in...</span>";
+        }
+        if (alertBox) {
+            alertBox.className = "auth-alert";
+            alertBox.textContent = "";
+        }
 
         try {
-            const response = await fetch("http://localhost:8000/api/auth/login/", {
+            const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+                ? window.location.origin
+                : 'http://localhost:8080';
+
+            const response = await fetch(`${apiBase}/api/auth/login/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -20,33 +52,33 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const data = await response.json();
-            console.log("Login response:", data);
-            console.log("Response status:", response.status);
 
             if (response.ok) {
-                alert("Login successful!");
                 if (data.token) {
                     localStorage.setItem("token", data.token);
-                    console.log("Token stored in localStorage");
-                } else {
-                    console.error("No token in response data");
                 }
                 if (data.user) {
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    console.log("User data stored in localStorage");
                 }
-                console.log("Login successful:", data);
-                console.log("Token in localStorage after login:", localStorage.getItem("token"));
-                window.location.href = "index.html";
+                showAuthMessage("Signed in successfully! Redirecting...", "success");
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 500);
             } else {
-                alert(`Login failed: ${JSON.stringify(data)}`);
+                const errMsg =
+                    data.detail ||
+                    data.error ||
+                    (typeof data === "object" ? Object.values(data).flat().join(" ") : "Invalid credentials.");
+                showAuthMessage(errMsg || "Login failed. Please check your credentials.", "error");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Login failed due to a network error.");
+            showAuthMessage("Unable to reach the server. Make sure the backend is running (e.g. on port 8080).", "error");
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHTML;
+            }
         }
     });
 });
-
-
-            

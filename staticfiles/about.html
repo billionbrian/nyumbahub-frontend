@@ -4,125 +4,195 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About Us - NyumbaHub</title>
+  <title>About Us | NyumbaHub</title>
+  <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="about.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/global-ui.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 
-<body>
-  <!-- Header -->
-  <header class="navbar">
-    <div class="logo">
-      <h1>NyumbaHub</h1>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html" class="active">About</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+<body hx-ext="head-support">
+  <div id="navbar"></div>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="overlay"></div>
-    <div class="hero-text">
-      <h2>Welcome to NyumbaHub</h2>
-      <p>Making House Hunting Effortless — find your next dream home today.</p>
-    </div>
-  </section>
-
-  <!-- Mission -->
-  <section class="introduction fade-in">
-    <h2>Our Mission</h2>
-    <p>At NyumbaHub, our mission is to make finding your dream home simple, efficient, and enjoyable.
-      We are committed to providing top-notch services to help you every step of the way.</p>
-  </section>
-
-  <!-- Services -->
-  <section class="services-overview fade-in">
-    <h2>What We Offer</h2>
-    <ul>
-      <li>Property Listings</li>
-      <li>Real Estate Consultation</li>
-      <li>Home Financing Assistance</li>
-      <li>Property Management</li>
-    </ul>
-  </section>
-
-  <!-- Featured Houses -->
-  <section class="house-listings fade-in">
-    <h2>Featured Houses</h2>
-    <div class="house-grid">
-      <div class="house-card">
-        <img src="john-fornander-Id7u0EkTjBE-unsplash.jpg" alt="Modern Family Home" />
-        <h3>Modern Family Home</h3>
-        <p><strong>Price:</strong> $350,000</p>
-        <p><strong>Location:</strong> New York, NY</p>
-        <p>A beautiful modern home perfect for families, featuring 4 bedrooms, 3 bathrooms, and a spacious backyard.</p>
+  <div id="content-swap" class="content-swap" data-page="about" hx-target="#content-swap" hx-select="#content-swap" hx-swap="outerHTML show:window:top" hx-push-url="true">
+    <link rel="stylesheet" href="about.css" />
+    <main>
+    <!-- Hero Section -->
+    <section class="about-hero">
+      <div class="about-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>Verified Campus Housing Network</span>
       </div>
+      <h1>Building the Future of <span>Campus Living</span></h1>
+      <p>NyumbaHub connects university students directly with verified hostels and responsible landlords across Kenya — zero middleman exploitation, 100% peace of mind.</p>
+    </section>
 
-      <div class="house-card">
-        <img src="naomi-ellsworth-EMPLSuvDuhQ-unsplash.jpg" alt="Cozy Cottage" />
-        <h3>Cozy Cottage</h3>
-        <p><strong>Price:</strong> $200,000</p>
-        <p><strong>Location:</strong> Asheville, NC</p>
-        <p>This charming cottage offers 2 bedrooms, 1 bathroom, and a serene countryside view.</p>
+    <!-- Platform Verification Standards (Serious Institutional Commitments) -->
+    <section class="about-stats-section">
+      <div class="about-stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h3>100%</h3>
+          <p>Inspected Premises</p>
+          <span class="stat-sub">Verified room dimensions & utilities</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <h3>KES 0</h3>
+          <p>Brokerage Fees</p>
+          <span class="stat-sub">Direct contact with property hosts</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <h3>Compliant</h3>
+          <p>Digital Tenancy Leases</p>
+          <span class="stat-sub">Standardized Kenyan tenancy contracts</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+          <h3>Exact</h3>
+          <p>Campus Commute Mapping</p>
+          <span class="stat-sub">Accurate walking & transit distances</span>
+        </div>
       </div>
+    </section>
 
-      <div class="house-card">
-        <img src="daniel-barnes-RKdLlTyjm5g-unsplash.jpg" alt="Luxury Villa" />
-        <h3>Luxury Villa</h3>
-        <p><strong>Price:</strong> $1,200,000</p>
-        <p><strong>Location:</strong> Beverly Hills, CA</p>
-        <p>Experience luxury living in this stunning villa with 6 bedrooms, 5 bathrooms, and a private pool.</p>
+    <!-- Story / Mission Section -->
+    <section class="about-story-section">
+      <div class="story-grid">
+        <div class="story-text">
+          <h2>Why We Built NyumbaHub</h2>
+          <p>Every semester, students arriving in university towns like Nairobi, Juja, Eldoret, and Nyeri face the same recurring challenge: unregulated housing brokers demanding exorbitant viewing fees, unverified listings, and insecure rental deposits.</p>
+          <p>We created <strong>NyumbaHub</strong> to turn this fragmented search into a transparent, digital-first experience. By pairing geolocation technology, digital tenancy agreements, and direct landlord communication, we ensure every student finds a secure home to thrive in their studies.</p>
+        </div>
+        <div class="story-image-wrap">
+          <img src="pexels-expect-best-79873-323780.jpg" alt="NyumbaHub Community" />
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Testimonials -->
-  <section class="testimonials fade-in">
-    <h2>What Our Clients Say</h2>
-    <blockquote>
-      <p>"NyumbaHub made finding our dream home a breeze! Highly recommend their services."</p>
-      <cite>- Jane Doe</cite>
-    </blockquote>
-    <blockquote>
-      <p>"Professional, reliable, and efficient. EasyHouse exceeded our expectations."</p>
-      <cite>- John Smith</cite>
-    </blockquote>
-    <blockquote>
-      <p>"The team at NyumbaHub was incredibly helpful and knowledgeable. We found our perfect home!"</p>
-      <cite>- Brian Billion</cite>
-    </blockquote>
-  </section>
-
-  <!-- Call to Action -->
-  <section class="call-to-action fade-in">
-    <h2>Ready to Find Your Dream Home?</h2>
-    <p>Contact us today and let us help you take the first step toward your new home.</p>
-    <a href="contact.html" class="cta-button">Get in Touch</a>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-content">
-      <div class="contact-info">
-        <p>Email: easyhouse31@gmail.com</p>
-        <p>Phone: +254 794900075</p>
+    <!-- Values Section -->
+    <section class="about-values-section">
+      <div class="section-header">
+        <h2>Our Core Operating Principles</h2>
+        <p>Professional standards guiding every accommodation listed on our platform</p>
       </div>
-      <div class="social-media">
-        <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">Instagram</a>
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3>Student Safety First</h3>
+          <p>Every landlord and property listed on NyumbaHub is verified with authentic photographs, perimeter security checks, and exact campus commute distances.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <h3>Fair & Transparent</h3>
+          <p>Clear rent prices in KES with no surprise viewing fees or arbitrary agent surcharges. What you see on the platform is what you pay.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </div>
+          <h3>Paperless & Modern</h3>
+          <p>From standardized digital tenancy agreements to fast M-Pesa rent payments, we bring Kenyan student renting into a secure, mobile-friendly workflow.</p>
+        </div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 NyumbaHub. All rights reserved.</p>
-        <a href="privacy-policy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a>
-      </div>
-    </div>
-  </footer>
+    </section>
 
+    <!-- Platform Verification Framework (Replaced fake testimonials with serious process) -->
+    <section class="about-framework-section">
+      <div class="section-header">
+        <h2>Platform Verification Framework</h2>
+        <p>How we ensure transparency, authenticity, and peace of mind for every listing</p>
+      </div>
+      <div class="framework-grid">
+        <div class="framework-card">
+          <div class="framework-step">01</div>
+          <h3>Host Identity & Ownership Check</h3>
+          <p>Landlords undergo national ID verification and submit proof of property management or title rights before any room listing is approved for publication.</p>
+        </div>
+        <div class="framework-card">
+          <div class="framework-step">02</div>
+          <h3>On-Site Premises Inspection</h3>
+          <p>Units are inspected for realistic photography, working water and electricity utilities, perimeter gate security, and walking distance to university facilities.</p>
+        </div>
+        <div class="framework-card">
+          <div class="framework-step">03</div>
+          <h3>Protected Digital Agreements</h3>
+          <p>Standardized digital tenancy agreements are generated with verified terms, ensuring both student tenants and hosts have clear, enforceable legal documentation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="about-cta-section">
+      <div class="about-cta-box">
+        <h2>Looking for Verified Campus Housing?</h2>
+        <p>Explore verified student hostels, single rooms, bedsitters, and apartments near your campus today.</p>
+        <a href="index.html" hx-get="index.html" class="cta-link">Start Searching Now</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      function initAboutPage() {
+        // About page interactive state
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAboutPage);
+      } else {
+        initAboutPage();
+      }
+      window.PageInitializers = window.PageInitializers || {};
+      window.PageInitializers['about'] = initAboutPage;
+    })();
+  </script>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="js/htmx.min.js"></script>
+  <script src="js/head-support.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="theme.js"></script>
   <script src="auth.js"></script>
 </body>
 

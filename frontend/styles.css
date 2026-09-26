@@ -2,11 +2,11 @@
 
 body {
     font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-    background: #blue ;
+    background: blue ;
     color: #222;
     margin: 0;
     padding: 0;
-    text-align: :right
+    text-align:right;
 }
 
 .privacy-policy-container {
