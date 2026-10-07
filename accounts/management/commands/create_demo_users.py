@@ -11,7 +11,7 @@ class Command(BaseCommand):
         demo_accounts = [
             {
                 "username": "demo_landlord",
-                "email": "demo_landlord@nyumbahub.test",
+                "email": "demo_landlord@tapin.test",
                 "password": "DemoLandlord123!",
                 "role": "landlord",
                 "phone": "+254700000001",
@@ -21,7 +21,7 @@ class Command(BaseCommand):
             },
             {
                 "username": "demo_tenant",
-                "email": "demo_tenant@nyumbahub.test",
+                "email": "demo_tenant@tapin.test",
                 "password": "DemoTenant123!",
                 "role": "tenant",
                 "phone": "+254700000002",
@@ -32,7 +32,7 @@ class Command(BaseCommand):
         ]
 
         self.stdout.write(self.style.WARNING("=================================================="))
-        self.stdout.write(self.style.WARNING("   NyumbaHub Development Demo User Provisioning   "))
+        self.stdout.write(self.style.WARNING("   TapIn Development Demo User Provisioning   "))
         self.stdout.write(self.style.WARNING("=================================================="))
 
         for account in demo_accounts:

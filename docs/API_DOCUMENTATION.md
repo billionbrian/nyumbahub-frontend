@@ -2,7 +2,7 @@
 
 ## Overview
 
-NyumbaHub provides a RESTful API for user authentication and property management. All API endpoints follow REST conventions and return JSON responses.
+TapIn provides a RESTful API for user authentication and property management. All API endpoints follow REST conventions and return JSON responses.
 
 **Base URL**: `http://127.0.0.1:8000/api/`
 

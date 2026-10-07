@@ -4,41 +4,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Property Details - NyumbaHub</title>
+  <title>Property Details - TapIn</title>
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="styles/global-ui.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
+      font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
       background-color: var(--bg-primary);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(255, 180, 0, 0.08) 0%, transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.04) 0%, transparent 50%);
       color: var(--text-primary);
       min-height: 100vh;
-      transition: background-color 250ms ease, color 250ms ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .detail-wrapper {
-      max-width: 1240px;
-      margin: 1.5rem auto 3rem;
-      padding: 0 1.25rem;
+      max-width: 1220px;
+      margin: 1.5rem auto 4rem;
+      padding: 0 1.5rem;
     }
 
-    /* Top Navigation Strip */
+    /* Top Navigation & Breadcrumbs Bar */
     .detail-top-nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
       gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .detail-breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
       flex-wrap: wrap;
     }
 
@@ -46,9 +57,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: var(--text-secondary);
+      color: var(--text-primary);
       text-decoration: none;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 600;
       padding: 6px 12px;
       border-radius: 8px;
@@ -60,7 +71,26 @@
     .back-btn:hover {
       color: var(--brand-primary);
       border-color: var(--brand-primary);
-      transform: translateX(-3px);
+      transform: translateX(-2px);
+    }
+
+    .crumb-separator {
+      color: var(--text-secondary);
+      opacity: 0.45;
+    }
+
+    .crumb-item {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .crumb-item.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .top-action-btns {
@@ -101,17 +131,18 @@
     }
 
     .detail-title {
-      font-size: 1.85rem;
+      font-size: clamp(1.6rem, 2.8vw, 2.25rem);
       font-weight: 700;
       color: var(--text-primary);
-      line-height: 1.3;
-      margin-bottom: 0.5rem;
+      letter-spacing: -0.025em;
+      line-height: 1.25;
+      margin-bottom: 0.6rem;
     }
 
     .detail-meta-row {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.85rem;
       flex-wrap: wrap;
       color: var(--text-secondary);
       font-size: 0.92rem;
@@ -122,44 +153,102 @@
       align-items: center;
       gap: 5px;
       font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .meta-loc a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .meta-loc a:hover {
+      color: var(--brand-primary);
+      text-decoration: underline;
     }
 
     .meta-badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 3px 10px;
+      gap: 5px;
+      padding: 4px 10px;
       border-radius: 9999px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
     }
 
-    .meta-badge.available { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .meta-badge.booked { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .meta-badge.maintenance { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .meta-badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
 
-    /* Airbnb-Style Multi-Image Showcase */
+    .meta-badge.available {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .meta-badge.available::before {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    .meta-badge.booked {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+    .meta-badge.booked::before {
+      background: #f59e0b;
+    }
+
+    .meta-badge.maintenance {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+    .meta-badge.maintenance::before {
+      background: #ef4444;
+    }
+
+    .verified-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #059669;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.08);
+      padding: 3px 9px;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* Airbnb-Grade Multi-Photo Showcase */
     .airbnb-gallery {
       position: relative;
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2.25rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
       background: var(--bg-tertiary);
     }
 
     .gallery-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 8px;
-      height: 440px;
+      gap: 6px;
+      height: 460px;
     }
 
     .gallery-single {
       grid-template-columns: 1fr;
-      height: 420px;
+      height: 440px;
     }
 
     .gallery-main-col {
@@ -173,13 +262,13 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.4s ease;
+      transition: filter 0.3s ease, transform 0.3s ease;
     }
 
     .gallery-sub-grid {
       display: grid;
       grid-template-rows: 1fr 1fr;
-      gap: 8px;
+      gap: 6px;
       height: 100%;
     }
 
@@ -194,45 +283,47 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.4s ease;
+      transition: filter 0.3s ease, transform 0.3s ease;
     }
 
     .gallery-main-col:hover img,
     .gallery-sub-item:hover img {
-      transform: scale(1.04);
+      filter: brightness(0.96);
+      transform: scale(1.015);
     }
 
     .gallery-photo-btn {
       position: absolute;
       bottom: 16px;
       right: 16px;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       padding: 7px 14px;
       font-size: 0.84rem;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       cursor: pointer;
       z-index: 5;
       transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     .gallery-photo-btn:hover {
-      background: rgba(15, 23, 42, 0.98);
-      transform: scale(1.04);
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
     /* Main Content Layout (2 Columns) */
     .detail-body-grid {
       display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 2.25rem;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 2.5rem;
       align-items: start;
     }
 
@@ -240,86 +331,113 @@
     .detail-left-col {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1.75rem;
     }
 
+    /* Sleek Property Overview Bar */
+    .property-overview-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .overview-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .overview-item:not(:last-child) {
+      border-right: 1px solid var(--border-color);
+      padding-right: 0.75rem;
+    }
+
+    .overview-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--bg-tertiary);
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--border-color);
+    }
+
+    .overview-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .overview-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      line-height: 1.2;
+    }
+
+    .overview-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    /* Clean Section Cards */
     .section-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      padding: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
 
     .section-card h2,
     .section-card h3 {
-      font-size: 1.25rem;
+      font-size: 1.18rem;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 1rem;
+      letter-spacing: -0.015em;
+      margin-bottom: 1.2rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-    }
-
-    /* Quick Specs Bar */
-    .specs-strip {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 0.75rem;
-    }
-
-    .spec-box {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 0.9rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .spec-box-label {
-      font-size: 0.76rem;
-      color: var(--text-secondary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .spec-box-val {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      gap: 0.6rem;
     }
 
     /* Host Card */
     .host-card {
       display: flex;
       align-items: center;
-      gap: 1.2rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
     }
 
     .host-avatar {
-      width: 64px;
-      height: 64px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #4f46e5, #06b6d4);
-      color: #ffffff;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 700;
       letter-spacing: 0.5px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
       flex-shrink: 0;
-      border: 3px solid var(--card-bg);
-      outline: 2px solid var(--border-color);
+      border: 2px solid var(--border-color);
       user-select: none;
     }
 
@@ -329,7 +447,7 @@
     }
 
     .host-name {
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       font-weight: 700;
       color: var(--text-primary);
       display: flex;
@@ -337,24 +455,37 @@
       gap: 0.5rem;
     }
 
+    .host-badge-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
     .host-role {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       color: var(--text-secondary);
-      margin-bottom: 0.35rem;
+      margin-top: 2px;
+      margin-bottom: 0.5rem;
     }
 
     .host-contact-links {
       display: flex;
       gap: 0.6rem;
-      margin-top: 0.4rem;
       flex-wrap: wrap;
     }
 
     .btn-contact {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 5px 12px;
+      gap: 6px;
+      padding: 6px 14px;
       border-radius: 8px;
       font-size: 0.82rem;
       font-weight: 600;
@@ -364,42 +495,48 @@
     }
 
     .btn-whatsapp {
-      background: rgba(37, 211, 102, 0.15);
-      color: #25d366;
+      background: rgba(37, 211, 102, 0.12);
+      color: #15803d;
       border: 1px solid rgba(37, 211, 102, 0.35);
     }
     .btn-whatsapp:hover {
       background: #25d366;
-      color: #000;
+      color: #000000;
     }
 
     .btn-phone {
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.35);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
     }
     .btn-phone:hover {
-      background: #3b82f6;
-      color: #fff;
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
     }
 
     /* Amenities Grid */
     .amenities-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 0.8rem;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.75rem;
     }
 
     .amenity-item {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      font-size: 0.9rem;
+      gap: 0.7rem;
+      font-size: 0.88rem;
+      font-weight: 500;
       color: var(--text-primary);
-      padding: 8px 12px;
+      padding: 10px 14px;
       background: var(--bg-tertiary);
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid var(--border-color);
+      transition: border-color 0.2s ease;
+    }
+
+    .amenity-item:hover {
+      border-color: var(--brand-primary);
     }
 
     .amenity-item svg {
@@ -407,15 +544,253 @@
       flex-shrink: 0;
     }
 
+    /* Campus & Commute Section */
+    .commute-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .commute-header-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .commute-icon-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255, 180, 0, 0.12);
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 180, 0, 0.25);
+    }
+
+    .commute-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .commute-stat-card {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+      transition: border-color 0.2s ease;
+    }
+
+    .commute-stat-card:hover {
+      border-color: var(--border-color);
+    }
+
+    .commute-badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--brand-primary);
+    }
+
+    .commute-badge-tag.user-tag {
+      color: #3b82f6;
+    }
+
+    .commute-stat-main {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .commute-walk-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--border-color);
+    }
+
+    .commute-walk-icon.user-icon {
+      color: #3b82f6;
+    }
+
+    .commute-time {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .commute-dist {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .commute-note {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .btn-locate-commute {
+      margin-top: 0.35rem;
+      width: 100%;
+      padding: 0.6rem 0.9rem;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #2563eb;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-locate-commute:hover {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-locate-commute:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .commute-feedback {
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(239, 68, 68, 0.08);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      margin-top: 0.4rem;
+    }
+
+    .commute-isp-notice {
+      margin-top: 0.6rem;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      line-height: 1.45;
+    }
+
+    .commute-isp-notice strong {
+      color: #d97706;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .commute-isp-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-isp-action {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-isp-action:hover {
+      background: #f59e0b;
+      color: #000000;
+    }
+
+    .commute-map-container {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-tertiary);
+    }
+
+    .map-legend-strip {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 0.7rem 1rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.dot-house {
+      background: var(--brand-primary);
+    }
+
+    .legend-dot.dot-pu {
+      background: #8b5cf6;
+    }
+
+    .legend-dot.dot-user {
+      background: #3b82f6;
+    }
+
     /* Right Column (Sticky Booking Widget) */
     .booking-sidebar {
       position: sticky;
-      top: 90px;
+      top: 92px;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 18px;
       padding: 1.75rem;
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
@@ -426,26 +801,27 @@
       align-items: baseline;
       justify-content: space-between;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 1rem;
+      padding-bottom: 1.1rem;
     }
 
     .booking-price-val {
-      font-size: 1.8rem;
+      font-size: 1.85rem;
       font-weight: 800;
       color: var(--text-primary);
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
     }
 
     .booking-price-cycle {
       font-size: 0.88rem;
       color: var(--text-secondary);
       font-weight: 500;
+      margin-left: 2px;
     }
 
     .booking-cost-breakdown {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.6rem;
       font-size: 0.88rem;
       color: var(--text-secondary);
     }
@@ -453,23 +829,27 @@
     .cost-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
 
     .cost-total {
       border-top: 1px solid var(--border-color);
-      padding-top: 0.6rem;
+      padding-top: 0.75rem;
+      margin-top: 0.25rem;
       font-weight: 700;
       color: var(--text-primary);
+      font-size: 0.95rem;
     }
 
+    /* Safaricom Green M-Pesa CTA Button */
     .btn-reserve {
       width: 100%;
-      padding: 0.9rem;
+      padding: 0.95rem;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--brand-primary), var(--brand-hover));
-      color: #000000;
-      font-weight: 700;
-      font-size: 1rem;
+      background: #00A352;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.98rem;
       border: none;
       cursor: pointer;
       display: flex;
@@ -477,23 +857,24 @@
       justify-content: center;
       gap: 8px;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(255, 180, 0, 0.3);
+      box-shadow: 0 4px 14px rgba(0, 163, 82, 0.25);
     }
 
     .btn-reserve:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 180, 0, 0.45);
+      background: #008744;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 163, 82, 0.35);
     }
 
     .btn-inquire {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.8rem;
       border-radius: 10px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
       font-weight: 600;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -503,116 +884,38 @@
     }
 
     .btn-inquire:hover {
-      border-color: var(--brand-primary);
-      color: var(--brand-primary);
+      border-color: #25d366;
+      color: #15803d;
+      background: rgba(37, 211, 102, 0.08);
     }
 
     .safety-callout {
       display: flex;
       align-items: flex-start;
-      gap: 0.6rem;
+      gap: 0.65rem;
       font-size: 0.8rem;
       color: var(--text-secondary);
       line-height: 1.45;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 8px;
-      padding: 0.75rem;
+      background: rgba(0, 163, 82, 0.06);
+      border: 1px solid rgba(0, 163, 82, 0.18);
+      border-radius: 10px;
+      padding: 0.85rem;
     }
 
     .safety-callout svg {
-      color: #10b981;
+      color: #00A352;
       flex-shrink: 0;
       margin-top: 2px;
     }
 
-    /* Lightbox Modal */
-    .lightbox-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.92);
-      backdrop-filter: blur(10px);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-
-    .lightbox-content {
-      position: relative;
-      max-width: 900px;
-      width: 100%;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .lightbox-content img {
-      max-width: 100%;
-      max-height: 75vh;
-      object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .lightbox-close-btn {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      background: none;
-      border: none;
-      color: #ffffff;
-      font-size: 2rem;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    .lightbox-nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: #ffffff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .lightbox-nav-btn:hover {
-      background: rgba(255, 255, 255, 0.4);
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .lightbox-prev { left: -60px; }
-    .lightbox-next { right: -60px; }
-
-    .lightbox-counter {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.9rem;
-      margin-top: 0.8rem;
-    }
-
-    /* Payment Modal */
+    /* M-Pesa Payment / Booking Modal */
     .payment-modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(6px);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 2000;
       align-items: center;
       justify-content: center;
@@ -622,16 +925,377 @@
     .payment-modal-box {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      max-width: 460px;
+      border-radius: 18px;
+      max-width: 440px;
       width: 100%;
       padding: 1.75rem;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    /* M-Pesa Modal Dynamic Status Styles */
+    .stk-status-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      padding: 0.25rem 0;
+    }
+
+    .stk-icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .stk-icon-waiting {
+      background: rgba(0, 163, 82, 0.12);
+      color: #00A352;
+      border: 2px solid rgba(0, 163, 82, 0.3);
+      animation: stk-pulse-ring 2s infinite ease-out;
+    }
+
+    .stk-icon-cancelled {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 2px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .stk-icon-timeout {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 2px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .stk-icon-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      border: 2px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .stk-timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .stk-timer-progress-wrap {
+      width: 100%;
+      height: 5px;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 4px 0 10px 0;
+    }
+
+    .stk-timer-progress-bar {
+      height: 100%;
+      width: 100%;
+      background: #00A352;
+      border-radius: 3px;
+      transition: width 1s linear, background-color 0.3s ease;
+    }
+
+    .stk-receipt-table {
+      width: 100%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.86rem;
+    }
+
+    .stk-receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .stk-receipt-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    @keyframes stk-pulse-ring {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 163, 82, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 14px rgba(0, 163, 82, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 163, 82, 0);
+      }
+    }
+
+    /* Payment Plan Selector Styles */
+    .payment-plan-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-tertiary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .payment-plan-option:hover {
+      border-color: rgba(0, 163, 82, 0.4);
+    }
+
+    .payment-plan-option.selected {
+      border-color: #00A352;
+      background: rgba(0, 163, 82, 0.05);
+    }
+
+    .plan-btn {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .plan-btn:hover {
+      border-color: rgba(0, 163, 82, 0.4);
+    }
+
+    .plan-btn.active {
+      border-color: #00A352;
+      background: rgba(0, 163, 82, 0.08);
+      color: #00A352;
+    }
+
+    /* Fullscreen Lightbox Modal */
+
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 9999;
+      flex-direction: column;
+      justify-content: space-between;
+      outline: none;
+    }
+
+    .lightbox-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(10, 12, 16, 0.85);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 10;
+    }
+
+    .lightbox-counter-pill {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .lightbox-title-bar {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.92rem;
+      font-weight: 600;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    .lightbox-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      line-height: 1;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-close-btn:hover {
+      background: rgba(239, 68, 68, 0.8);
+      border-color: #ef4444;
+      transform: scale(1.08);
+    }
+
+    .lightbox-main-stage {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .lightbox-img-wrapper {
+      max-width: 90vw;
+      max-height: 72vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .lightbox-img-wrapper img {
+      max-width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .lightbox-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .lightbox-nav-btn:hover {
+      background: var(--brand-primary);
+      color: #000000;
+      border-color: var(--brand-primary);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .lightbox-prev { left: 24px; }
+    .lightbox-next { right: 24px; }
+
+    /* Bottom Thumbnail Strip */
+    .lightbox-thumbs-strip {
+      display: flex;
+      gap: 8px;
+      padding: 12px 20px;
+      overflow-x: auto;
+      justify-content: center;
+      background: rgba(10, 12, 16, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 100%;
+      scrollbar-width: thin;
+    }
+
+    .lightbox-thumb-item {
+      width: 64px;
+      height: 48px;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      opacity: 0.55;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-thumb-item.active {
+      opacity: 1;
+      border-color: var(--brand-primary);
+      transform: scale(1.06);
+    }
+
+    .lightbox-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Location Pin Marker Styling */
+    .custom-property-pin-wrap {
+      background: transparent !important;
+      border: none !important;
+    }
+
+    .nyumba-location-pin {
+      position: relative;
+      width: 38px;
+      height: 48px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+
+    .nyumba-location-pin .pin-teardrop {
+      fill: var(--brand-primary, #ffb400);
+      stroke: #ffffff;
+      transition: fill 0.2s ease;
+    }
+
+    .nyumba-location-pin .pin-house {
+      fill: #18181b;
+      transition: fill 0.2s ease;
+    }
+
+    .nyumba-location-pin .pin-house-cutout {
+      fill: var(--brand-primary, #ffb400);
+      transition: fill 0.2s ease;
+    }
+
+    .nyumba-location-pin:hover {
+      transform: translateY(-4px) scale(1.06);
     }
 
     @media (max-width: 900px) {
       .detail-body-grid {
         grid-template-columns: 1fr;
+      }
+
+      .property-overview-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .overview-item:nth-child(2) {
+        border-right: none;
       }
 
       .gallery-grid {
@@ -643,8 +1307,14 @@
         display: none;
       }
 
+      .commute-cards-grid {
+        grid-template-columns: 1fr;
+      }
+
       .lightbox-prev { left: 10px; }
       .lightbox-next { right: 10px; }
+      .lightbox-top-bar { padding: 12px 16px; }
+      .lightbox-thumbs-strip { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -657,20 +1327,26 @@
       <div class="detail-wrapper">
         <!-- Top Nav -->
         <div class="detail-top-nav">
-          <a href="index.html" hx-get="index.html" class="back-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5"></path>
-              <path d="M12 19l-7-7 7-7"></path>
-            </svg>
-            Back to Listings
-          </a>
+          <div class="detail-breadcrumbs">
+            <a href="index.html" hx-get="index.html" class="back-btn" onclick="sessionStorage.removeItem('current_property_id'); window._currentPropertyId = null;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <path d="M12 19l-7-7 7-7"></path>
+              </svg>
+              <span>Back to Listings</span>
+            </a>
+            <span class="crumb-separator">/</span>
+            <span class="crumb-item" id="crumbLocation">Kilifi, Kenya</span>
+            <span class="crumb-separator">/</span>
+            <span class="crumb-item active" id="crumbTitle">Property Details</span>
+          </div>
 
           <div class="top-action-btns">
-            <button class="btn-action-icon" id="shareBtn" onclick="shareListing()">
+            <button class="btn-action-icon" id="shareBtn" onclick="shareListing()" title="Share Property">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-              Share
+              <span>Share</span>
             </button>
-            <button class="btn-action-icon" id="saveListingBtn" onclick="toggleSaveCurrentListing()">
+            <button class="btn-action-icon" id="saveListingBtn" onclick="toggleSaveCurrentListing()" title="Save to Favorites">
               <svg id="saveListingHeart" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
@@ -688,38 +1364,91 @@
     </main>
 
     <!-- Fullscreen Lightbox Modal -->
-    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
-      <div class="lightbox-content">
-        <button class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
-        <button class="lightbox-nav-btn lightbox-prev" onclick="prevLightboxImage(event)">&#10094;</button>
-        <img id="lightboxImg" src="" alt="Property Preview">
-        <button class="lightbox-nav-btn lightbox-next" onclick="nextLightboxImage(event)">&#10095;</button>
-        <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+    <div class="lightbox-modal" id="lightboxModal" tabindex="-1">
+      <div class="lightbox-top-bar">
+        <span class="lightbox-counter-pill" id="lightboxCounter">1 / 1</span>
+        <span class="lightbox-title-bar" id="lightboxTitle">Property Photos</span>
+        <button class="lightbox-close-btn" onclick="closeLightbox()" title="Close (Esc)">&times;</button>
       </div>
+
+      <div class="lightbox-main-stage" id="lightboxStage">
+        <button class="lightbox-nav-btn lightbox-prev" onclick="prevLightboxImage(event)" title="Previous (Left arrow)">&#10094;</button>
+        <div class="lightbox-img-wrapper" id="lightboxImgWrapper">
+          <img id="lightboxImg" src="" alt="Property Preview">
+        </div>
+        <button class="lightbox-nav-btn lightbox-next" onclick="nextLightboxImage(event)" title="Next (Right arrow)">&#10095;</button>
+      </div>
+
+      <!-- Bottom Thumbnails Strip -->
+      <div class="lightbox-thumbs-strip" id="lightboxThumbs"></div>
     </div>
 
     <!-- M-Pesa Payment / Booking Modal -->
     <div class="payment-modal" id="paymentModal">
       <div class="payment-modal-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <h3 style="font-size:1.2rem; font-weight:700;">Secure M-Pesa Booking</h3>
-          <button style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary);" onclick="closePaymentModal()">&times;</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:rgba(0,163,82,0.12); color:#00A352; display:flex; align-items:center; justify-content:center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            </div>
+            <div>
+              <h3 style="font-size:1.15rem; font-weight:700; margin:0; line-height:1.2;">M-Pesa Express Checkout</h3>
+              <span style="font-size:0.75rem; color:#059669; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Secure 256-bit Encrypted
+              </span>
+            </div>
+          </div>
+          <button style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-secondary); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background 0.2s;" onclick="closePaymentModal()">&times;</button>
         </div>
-        <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:1.2rem;">
-          Enter your Safaricom M-Pesa mobile number to receive an STK prompt on your phone for deposit reservation.
-        </p>
-        <div style="margin-bottom:1rem;">
-          <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem;">Safaricom Phone Number</label>
-          <input type="text" id="mpesaPhone" placeholder="0712345678" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); font-size:0.95rem;">
+
+        <!-- Form View: Phone Number & Amount -->
+        <div id="paymentFormSection">
+          <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.45;">
+            Enter your Safaricom mobile number. A secure PIN prompt will pop up automatically on your phone to authorize payment.
+          </p>
+
+          <!-- Plan Toggle in Modal -->
+          <div style="margin-bottom:1.15rem;">
+            <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem; color:var(--text-primary);">Choose What to Pay</label>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+              <button type="button" id="modalPlanRentBtn" class="plan-btn active" onclick="switchModalPlan('rent')">
+                <div id="modalRentAmountVal" style="font-weight:700; font-size:0.92rem;">KES 0</div>
+                <div style="font-size:0.72rem; color:var(--text-secondary); margin-top:2px;">1st Month Rent</div>
+              </button>
+              <button type="button" id="modalPlanFullBtn" class="plan-btn" onclick="switchModalPlan('full')">
+                <div id="modalFullAmountVal" style="font-weight:700; font-size:0.92rem;">KES 0</div>
+                <div style="font-size:0.72rem; color:var(--text-secondary); margin-top:2px;">Rent + Deposit</div>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1.1rem;">
+            <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem; color:var(--text-primary);">Safaricom Phone Number</label>
+            <div style="position:relative;">
+              <input type="tel" id="mpesaPhone" placeholder="0712 345 678" style="width:100%; padding:0.75rem 0.85rem; border-radius:10px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-primary); font-size:0.95rem; font-weight:500; outline:none; transition:border-color 0.2s;">
+            </div>
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:block; margin-top:0.35rem;">Accepts 07XXXXXXXX, 01XXXXXXXX, or +2547XXXXXXXX</span>
+          </div>
+
+          <div style="margin-bottom:1.35rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <label style="font-size:0.82rem; font-weight:600; color:var(--text-primary); margin:0;">Amount to Prompt</label>
+              <span id="mpesaPlanNotice" style="font-size:0.75rem; color:var(--text-secondary);">1st Month Rent (Deposit on move-in)</span>
+            </div>
+            <input type="text" id="mpesaAmount" readonly style="width:100%; padding:0.75rem 0.85rem; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-tertiary); color:var(--text-primary); font-size:1.05rem; font-weight:700;">
+          </div>
+
+          <button class="btn-reserve" id="btnConfirmPay" onclick="submitMpesaPayment()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span id="btnConfirmPayText">Send M-Pesa Prompt</span>
+          </button>
+
+          <div id="paymentFeedback" style="margin-top:1rem; font-size:0.88rem; padding:0.85rem; border-radius:10px; display:none; line-height:1.5;"></div>
         </div>
-        <div style="margin-bottom:1.25rem;">
-          <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem;">Booking Amount (KES)</label>
-          <input type="number" id="mpesaAmount" readonly style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-tertiary); color:var(--text-primary); font-size:0.95rem; font-weight:700;">
-        </div>
-        <button class="btn-reserve" id="btnConfirmPay" onclick="submitMpesaPayment()">
-          <span>Send M-Pesa Prompt</span>
-        </button>
-        <div id="paymentFeedback" style="margin-top:0.8rem; font-size:0.84rem; display:none;"></div>
+
+        <!-- Dynamic Status View: Waiting (with countdown), Cancelled, Timeout, Success, Failed -->
+        <div id="paymentStatusSection" style="display:none;"></div>
       </div>
     </div>
 
@@ -734,6 +1463,99 @@
           return window.location.origin;
         }
         return 'http://localhost:8080';
+      }
+
+      function ensureLeaflet(callback) {
+        if (typeof L !== 'undefined') {
+          callback();
+          return;
+        }
+        if (!document.querySelector('link[href*="leaflet.css"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          link.crossOrigin = '';
+          document.head.appendChild(link);
+        }
+        let script = document.querySelector('script[src*="leaflet.js"]');
+        if (!script) {
+          script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          script.crossOrigin = '';
+          script.onload = () => callback();
+          document.head.appendChild(script);
+        } else {
+          script.addEventListener('load', () => callback());
+        }
+      }
+
+      // Pwani University (PU) Main Gate Reference Coordinates (along Mombasa-Malindi Highway B8)
+      const PU_COORDS = { lat: -3.62074, lon: 39.84437, name: 'Pwani University Main Campus Gate' };
+
+      // Haversine straight-line distance formula (used for quick checks and fallbacks)
+      function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
+
+      // Fetch real walking route on actual roads & footpaths via OSRM Foot routing
+      async function fetchWalkingRoute(startLat, startLon, endLat, endLon) {
+        try {
+          const url = `https://router.project-osrm.org/route/v1/foot/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`OSRM HTTP ${res.status}`);
+          const data = await res.json();
+          if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+            const r = data.routes[0];
+            // coordinates are [lon, lat], convert to Leaflet [lat, lon]
+            const coords = r.geometry.coordinates.map(pt => [pt[1], pt[0]]);
+            return {
+              distanceMeters: r.distance,
+              coordinates: coords,
+              isRealRoad: true
+            };
+          }
+        } catch (err) {
+          console.warn('Real walking route lookup error, falling back to road-factored calculation:', err);
+        }
+
+        // Resilient Fallback: Haversine distance with 1.25 road curvature factor
+        const straightDistKm = calculateDistanceKm(startLat, startLon, endLat, endLon);
+        const fallbackMeters = straightDistKm * 1250;
+        return {
+          distanceMeters: fallbackMeters,
+          coordinates: [[startLat, startLon], [endLat, endLon]],
+          isRealRoad: false
+        };
+      }
+
+      // Walking commute formatter using standard student walking pace (4.8 km/h = 80m/min)
+      function formatRouteCommute(distMeters) {
+        const walkMinutes = Math.max(1, Math.round((distMeters / 1000 / 4.8) * 60));
+        let distFormatted;
+        if (distMeters < 1000) {
+          distFormatted = `${Math.round(distMeters)} meters`;
+        } else {
+          distFormatted = `${(distMeters / 1000).toFixed(1)} km`;
+        }
+
+        let timeFormatted;
+        if (walkMinutes < 60) {
+          timeFormatted = `${walkMinutes} min${walkMinutes === 1 ? '' : 's'} walk`;
+        } else {
+          const hrs = Math.floor(walkMinutes / 60);
+          const mins = walkMinutes % 60;
+          timeFormatted = `${hrs} hr ${mins > 0 ? mins + ' min' : ''} walk`;
+        }
+
+        return { distFormatted, timeFormatted, walkMinutes };
       }
 
       function resolveUrl(url) {
@@ -773,17 +1595,47 @@
         return name.slice(0, 2).toUpperCase();
       }
 
+      let isFetchingPropertyDetail = false;
+      let lastLoadedPropertyId = null;
+
       async function initPropertyDetailPage() {
         const urlParams = new URLSearchParams(window.location.search);
-        const propertyId = urlParams.get('id');
-        const propertyContent = document.getElementById('propertyContent');
+        let propertyId = urlParams.get('id');
 
+        // Robust resolution across HTMX navigation and stored page states
+        if (!propertyId && window._currentPropertyId) {
+          propertyId = window._currentPropertyId;
+        }
+        if (!propertyId) {
+          try {
+            propertyId = sessionStorage.getItem('current_property_id');
+          } catch(e) {}
+        }
+        if (!propertyId) {
+          const swap = document.getElementById('content-swap');
+          if (swap && swap.dataset && swap.dataset.propertyId) {
+            propertyId = swap.dataset.propertyId;
+          }
+        }
+
+        const propertyContent = document.getElementById('propertyContent');
         if (!propertyContent) return;
 
         if (!propertyId) {
-          propertyContent.innerHTML = '<div style="text-align:center; padding:3rem; color:#ef4444;"><h3>Property ID not found</h3><p>Please select a property from the listings.</p></div>';
+          propertyContent.innerHTML = '<div style="text-align:center; padding:3rem; color:#ef4444;"><h3>Property ID not found</h3><p>Please select a property from the listings.</p><a href="index.html" class="back-btn" style="margin-top:1rem; display:inline-flex;">Browse Listings</a></div>';
           return;
         }
+
+        // Cache property ID and keep URL in sync
+        window._currentPropertyId = String(propertyId);
+        try { sessionStorage.setItem('current_property_id', String(propertyId)); } catch(e) {}
+        if (window.history && window.history.replaceState && (!window.location.search || !window.location.search.includes('id='))) {
+          window.history.replaceState({ page: 'property-detail', id: propertyId }, '', `property-detail.html?id=${propertyId}`);
+        }
+
+        if (isFetchingPropertyDetail && lastLoadedPropertyId === propertyId) return;
+        isFetchingPropertyDetail = true;
+        lastLoadedPropertyId = propertyId;
 
         try {
           const token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
@@ -801,6 +1653,8 @@
         } catch (err) {
           console.error('Error fetching property detail:', err);
           propertyContent.innerHTML = '<div style="text-align:center; padding:3rem; color:#ef4444;"><h3>Error loading property details</h3></div>';
+        } finally {
+          isFetchingPropertyDetail = false;
         }
       }
 
@@ -880,6 +1734,12 @@
         const landlordPhone = landlord.phone || '+254700000000';
         const cleanPhone = landlordPhone.replace(/[^0-9]/g, '');
 
+        // Sync top breadcrumbs
+        const crumbLocation = document.getElementById('crumbLocation');
+        const crumbTitle = document.getElementById('crumbTitle');
+        if (crumbLocation) crumbLocation.textContent = p.location || 'Kilifi, Kenya';
+        if (crumbTitle) crumbTitle.textContent = p.title || 'Accommodation';
+
         propertyContent.innerHTML = `
           <!-- Header -->
           <div class="detail-header">
@@ -887,12 +1747,12 @@
             <div class="detail-meta-row">
               <span class="meta-badge ${status}">${statusLabel}</span>
               <div class="meta-loc">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>${p.location || 'Kilifi, Kenya'}</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <a href="#detailCommuteMap" onclick="document.getElementById('detailCommuteMap')?.scrollIntoView({behavior:'smooth'})">${p.location || 'Kilifi, Kenya'}</a>
               </div>
-              <span>•</span>
-              <span style="color:#10b981; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span class="crumb-separator">•</span>
+              <span class="verified-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
                 Verified Student Housing
               </span>
             </div>
@@ -905,46 +1765,138 @@
           <div class="detail-body-grid">
             <!-- Left Info -->
             <div class="detail-left-col">
-              <!-- Specs Strip -->
-              <div class="specs-strip">
-                <div class="spec-box">
-                  <span class="spec-box-label">Bedrooms</span>
-                  <span class="spec-box-val">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"></path></svg>
-                    ${p.bedrooms || 1} Bed${p.bedrooms == 1 ? '' : 's'}
-                  </span>
+              <!-- Sleek Overview Specs Bar -->
+              <div class="property-overview-bar">
+                <div class="overview-item">
+                  <div class="overview-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"></path></svg>
+                  </div>
+                  <div class="overview-meta">
+                    <span class="overview-label">Bedrooms</span>
+                    <span class="overview-val">${p.bedrooms || 1} Bed${p.bedrooms == 1 ? '' : 's'}</span>
+                  </div>
                 </div>
-                <div class="spec-box">
-                  <span class="spec-box-label">Bathrooms</span>
-                  <span class="spec-box-val">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h6M12 6v6M4 12h16a2 2 0 0 1 2 2v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2a2 2 0 0 1 2-2z"></path></svg>
-                    ${p.bathrooms || 1} Bath
-                  </span>
+                <div class="overview-item">
+                  <div class="overview-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h6M12 6v6M4 12h16a2 2 0 0 1 2 2v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2a2 2 0 0 1 2-2z"></path></svg>
+                  </div>
+                  <div class="overview-meta">
+                    <span class="overview-label">Bathrooms</span>
+                    <span class="overview-val">${p.bathrooms || 1} Bath</span>
+                  </div>
                 </div>
-                <div class="spec-box">
-                  <span class="spec-box-label">Property Type</span>
-                  <span class="spec-box-val">${typeLabel}</span>
+                <div class="overview-item">
+                  <div class="overview-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                  </div>
+                  <div class="overview-meta">
+                    <span class="overview-label">Type</span>
+                    <span class="overview-val">${typeLabel}</span>
+                  </div>
                 </div>
-                <div class="spec-box">
-                  <span class="spec-box-label">Status</span>
-                  <span class="spec-box-val" style="color:#10b981;">${statusLabel}</span>
+                <div class="overview-item">
+                  <div class="overview-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </div>
+                  <div class="overview-meta">
+                    <span class="overview-label">Status</span>
+                    <span class="overview-val" style="color:${status === 'available' ? '#059669' : '#d97706'};">${statusLabel}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Campus & Location Commute Section -->
+              <div class="commute-section">
+                <div class="commute-header-wrap">
+                  <div class="commute-icon-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                      <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 style="margin-bottom:2px; font-size:1.15rem; font-weight:700;">Campus Proximity &amp; Transit</h3>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0;">Calculated walking distances for Pwani University students</p>
+                  </div>
+                </div>
+
+                <div class="commute-cards-grid">
+                  <!-- 1. Pwani University Commute (Always visible, instant) -->
+                  <div class="commute-stat-card">
+                    <div class="commute-badge-tag">Pwani University (Main Gate)</div>
+                    <div class="commute-stat-main">
+                      <div class="commute-walk-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="4" r="2"></circle><path d="M15 22v-4l-3-2 1-4 3 2v4"></path><path d="M10 22l2-7-3-2-2 4"></path></svg>
+                      </div>
+                      <div>
+                        <div class="commute-time" id="puWalkEta">Calculating route...</div>
+                        <div class="commute-dist" id="puDistance">Measuring walking path to PU...</div>
+                      </div>
+                    </div>
+                    <div class="commute-note">Pedestrian route via road network to PU Highway B8 entrance</div>
+                  </div>
+
+                  <!-- 2. Live Current Location Commute (Permission requested on click) -->
+                  <div class="commute-stat-card">
+                    <div class="commute-badge-tag user-tag">Your Location</div>
+                    <div id="userLocContent">
+                      <div class="commute-stat-main">
+                        <div class="commute-walk-icon user-icon">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                        </div>
+                        <div>
+                          <div class="commute-time" id="userWalkEta">Live GPS Commute</div>
+                          <div class="commute-dist" id="userDistance">Click below to calculate walking route from where you are</div>
+                        </div>
+                      </div>
+                      <button type="button" class="btn-locate-commute" id="btnRequestUserLoc" onclick="requestUserLocationCommute()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="22" y1="12" x2="18" y2="12"></line>
+                          <line x1="6" y1="12" x2="2" y2="12"></line>
+                          <line x1="12" y1="6" x2="12" y2="2"></line>
+                          <line x1="12" y1="22" x2="12" y2="18"></line>
+                        </svg>
+                        <span>Calculate from My Location</span>
+                      </button>
+                    </div>
+                    <div id="userLocFeedback" class="commute-feedback" style="display:none;"></div>
+                    <div id="userLocIspNotice" class="commute-isp-notice" style="display:none;"></div>
+                  </div>
+                </div>
+
+                <!-- Interactive Commute Map -->
+                <div class="commute-map-container">
+                  <div id="detailCommuteMap" style="width:100%; height:280px;"></div>
+                  <div class="map-legend-strip">
+                    <span class="legend-item"><span class="legend-dot dot-house"></span> Accommodation</span>
+                    <span class="legend-item"><span class="legend-dot dot-pu"></span> PU Main Campus</span>
+                    <span class="legend-item" id="legendUser" style="display:none;"><span class="legend-dot dot-user"></span> Your Pin</span>
+                    <span style="margin-left:auto; font-size:0.75rem; color:var(--text-secondary); display:inline-flex; align-items:center; gap:4px;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      Tap map or drag blue pin to reposition
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <!-- Landlord Host Card -->
               <div class="section-card">
-                <h3>Host &amp; Landlord</h3>
+                <h3>Hosted by verified landlord</h3>
                 <div class="host-card">
                   <div class="host-avatar" style="background:${landlordAvatarBg};">${landlordInitials}</div>
                   <div class="host-meta">
                     <div class="host-name">
                       <span>${landlordName}</span>
-                      <span style="background:rgba(16,185,129,0.15); color:#10b981; font-size:0.72rem; padding:2px 7px; border-radius:999px;">Verified Host</span>
+                      <span class="host-badge-verified">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Verified Landlord
+                      </span>
                     </div>
-                    <div class="host-role">Listed on NyumbaHub • Responsive landlord</div>
+                    <div class="host-role">Official Property Host • Usually responds within 1 hour</div>
                     <div class="host-contact-links">
-                      <a href="https://wa.me/${cleanPhone}?text=Hello%20${encodeURIComponent(landlordName)},%20I%20am%20interested%20in%20your%20listing%20'${encodeURIComponent(p.title)}'%20on%20NyumbaHub." target="_blank" class="btn-contact btn-whatsapp">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                      <a href="https://wa.me/${cleanPhone}?text=Hello%20${encodeURIComponent(landlordName)},%20I%20am%20interested%20in%20your%20listing%20'${encodeURIComponent(p.title)}'%20on%20TapIn." target="_blank" class="btn-contact btn-whatsapp">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         WhatsApp Host
                       </a>
                       <a href="tel:${landlordPhone}" class="btn-contact btn-phone">
@@ -959,14 +1911,14 @@
               <!-- Description -->
               <div class="section-card">
                 <h3>About this accommodation</h3>
-                <p style="color:var(--text-secondary); line-height:1.7; white-space:pre-line;">
-                  ${p.description || 'No detailed description provided for this listing yet. Contact the landlord directly to schedule a viewing.'}
+                <p style="color:var(--text-secondary); line-height:1.75; font-size:0.95rem; white-space:pre-line;">
+                  ${p.description || 'No detailed description provided for this listing yet. Contact the landlord directly to schedule a viewing or request additional information.'}
                 </p>
               </div>
 
               <!-- Student Amenities -->
               <div class="section-card">
-                <h3>Included Amenities &amp; Perks</h3>
+                <h3>Included Amenities &amp; Services</h3>
                 <div class="amenities-grid">
                   <div class="amenity-item">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
@@ -986,11 +1938,11 @@
                   </div>
                   <div class="amenity-item">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                    <span>Self-Contained Bath</span>
+                    <span>Self-Contained Bathroom</span>
                   </div>
                   <div class="amenity-item">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                    <span>Close to Campus</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Campus Proximity</span>
                   </div>
                 </div>
               </div>
@@ -1006,24 +1958,52 @@
                 <span class="meta-badge ${status}">${statusLabel}</span>
               </div>
 
+              <!-- Payment Plan Options -->
+              <div class="payment-plan-selector" style="margin-bottom: 1.15rem;">
+                <label style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); margin-bottom:0.5rem;">Select Payment Option</label>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <label class="payment-plan-option selected" id="planOptionRent" onclick="selectPaymentPlan('rent')">
+                    <input type="radio" name="paymentPlanRadio" id="radioRent" value="rent" checked style="accent-color:#00A352; margin-top:2px;">
+                    <div style="flex:1;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:0.88rem; color:var(--text-primary);">
+                        <span>1st Month Rent</span>
+                        <span>KES ${formattedPrice}</span>
+                      </div>
+                      <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Reserve unit now • Deposit due on move-in</div>
+                    </div>
+                  </label>
+
+                  <label class="payment-plan-option" id="planOptionFull" onclick="selectPaymentPlan('full')">
+                    <input type="radio" name="paymentPlanRadio" id="radioFull" value="full" style="accent-color:#00A352; margin-top:2px;">
+                    <div style="flex:1;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:0.88rem; color:var(--text-primary);">
+                        <span>Full Move-in</span>
+                        <span style="color:#00A352;">KES ${(Number(p.rent_amount || 0) * 2).toLocaleString()}</span>
+                      </div>
+                      <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Rent + Deposit • Zero balance on check-in</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <div class="booking-cost-breakdown">
                 <div class="cost-row">
                   <span>Monthly Rent</span>
                   <span style="font-weight:600; color:var(--text-primary);">KES ${formattedPrice}</span>
                 </div>
                 <div class="cost-row">
-                  <span>Refundable Deposit</span>
+                  <span>Refundable Security Deposit</span>
                   <span style="font-weight:600; color:var(--text-primary);">KES ${formattedPrice}</span>
                 </div>
                 <div class="cost-row cost-total">
-                  <span>Total Move-in Estimate</span>
-                  <span style="color:var(--brand-primary); font-size:1.05rem;">KES ${(Number(p.rent_amount || 0) * 2).toLocaleString()}</span>
+                  <span id="breakdownDueLabel">Total Due Today (1st Month)</span>
+                  <span id="breakdownDueVal" style="color:#00A352; font-size:1.1rem; font-weight:800;">KES ${formattedPrice}</span>
                 </div>
               </div>
 
-              <button class="btn-reserve" onclick="openPaymentModal(${p.rent_amount || 0})">
+              <button class="btn-reserve" id="btnSidebarReserve" onclick="openPaymentModalWithPlan()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                <span>Reserve via M-Pesa</span>
+                <span id="btnSidebarReserveText">Reserve via M-Pesa • KES ${formattedPrice}</span>
               </button>
 
               <button class="btn-inquire" onclick="window.open('https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(landlordName)},%20I%20would%20like%20to%20inquire%20about%20${encodeURIComponent(p.title)}', '_blank')">
@@ -1033,96 +2013,937 @@
 
               <div class="safety-callout">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                <span><strong>NyumbaHub Verified Protection</strong>: Never send money outside the official agreement. Contact campus housing if any discrepancies occur.</span>
+                <span><strong>TapIn Verified Protection</strong>: Direct official booking with instant Safaricom M-Pesa confirmation and landlord receipt.</span>
               </div>
             </div>
           </div>
         `;
+
+        setupCampusCommute(p);
       }
 
-      // Lightbox Functions
+      let commuteMapInstance = null;
+      let userMarker = null;
+      let puPolyline = null;
+      let userRoutePolyline = null;
+      let currentPuRoute = null;
+
+      async function setupCampusCommute(p) {
+        const puWalkEta = document.getElementById('puWalkEta');
+        const puDistance = document.getElementById('puDistance');
+
+        const propLat = parseFloat(p.latitude);
+        const propLon = parseFloat(p.longitude);
+
+        if (isNaN(propLat) || isNaN(propLon)) {
+          if (puWalkEta) puWalkEta.textContent = 'Coordinates not pinned';
+          if (puDistance) puDistance.textContent = 'Landlord has not set map coordinates';
+          return;
+        }
+
+        if (puWalkEta) puWalkEta.textContent = 'Routing...';
+        if (puDistance) puDistance.textContent = 'Measuring walking path to PU...';
+
+        // 1. Fetch real walking route on actual streets to PU Main Gate
+        currentPuRoute = await fetchWalkingRoute(propLat, propLon, PU_COORDS.lat, PU_COORDS.lon);
+        const { distFormatted, timeFormatted } = formatRouteCommute(currentPuRoute.distanceMeters);
+
+        if (puWalkEta) puWalkEta.textContent = timeFormatted;
+        if (puDistance) {
+          puDistance.textContent = `${distFormatted} via road network to PU Gate`;
+        }
+
+        // 2. Initialize Commute Map with real polyline
+        initCommuteMap(propLat, propLon, p.title || 'Property', currentPuRoute);
+      }
+
+      function initCommuteMap(propLat, propLon, propTitle, puRoute) {
+        ensureLeaflet(() => {
+          const container = document.getElementById('detailCommuteMap');
+          if (!container) return;
+
+          if (commuteMapInstance) {
+            try { commuteMapInstance.remove(); } catch(e) {}
+            commuteMapInstance = null;
+            userMarker = null;
+            puPolyline = null;
+            userRoutePolyline = null;
+          }
+
+          const midLat = (propLat + PU_COORDS.lat) / 2;
+          const midLon = (propLon + PU_COORDS.lon) / 2;
+
+          commuteMapInstance = L.map('detailCommuteMap', {
+            zoomControl: true,
+            scrollWheelZoom: false
+          }).setView([midLat, midLon], 14);
+
+          L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Map data © Google'
+          }).addTo(commuteMapInstance);
+
+          // Custom Icon for Property (Yellow rounded house inside location-shaped pin)
+          const propertyIcon = L.divIcon({
+            className: 'custom-property-pin-wrap',
+            html: `
+              <div class="nyumba-location-pin" title="${propTitle}">
+                <svg width="38" height="48" viewBox="0 0 38 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Location shaped pin background in theme color -->
+                  <path class="pin-teardrop" d="M19 1C9.61 1 2 8.61 2 18C2 30.8 19 47 19 47C19 47 36 30.8 36 18C36 8.61 28.39 1 19 1Z" fill="#ffb400" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                  <!-- Rounded house icon inside -->
+                  <g transform="translate(9, 7.5)">
+                    <!-- Rounded Roof & House Silhouette -->
+                    <path class="pin-house" d="M10 2.4C9.55 2 8.85 2 8.4 2.4L2.3 7.85C1.85 8.25 2.15 9 2.75 9H3.5V17C3.5 17.83 4.17 18.5 5 18.5H15C15.83 18.5 16.5 17.83 16.5 17V9H17.25C17.85 9 18.15 8.25 17.7 7.85L11.6 2.4C11.15 2 10.45 2 10 2.4Z" fill="#18181b"/>
+                    <!-- Rounded Door Cutout -->
+                    <rect class="pin-house-cutout" x="8" y="11" width="4" height="7.5" rx="1.5" fill="#ffb400"/>
+                    <!-- Soft Attic Window -->
+                    <circle class="pin-house-cutout" cx="10" cy="6.2" r="1.2" fill="#ffb400"/>
+                  </g>
+                </svg>
+              </div>
+            `,
+            iconSize: [38, 48],
+            iconAnchor: [19, 48],
+            popupAnchor: [0, -48]
+          });
+
+          // Custom Icon for Pwani University (Purple Graduation Pin)
+          const puIcon = L.divIcon({
+            className: 'custom-pu-pin',
+            html: `<div style="background:#7c3aed; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.3); border:2px solid #fff;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            </div>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 17]
+          });
+
+          const propMarker = L.marker([propLat, propLon], { icon: propertyIcon }).addTo(commuteMapInstance);
+          propMarker.bindPopup(`<strong>${propTitle}</strong><br>Property Location`);
+
+          const puMarker = L.marker([PU_COORDS.lat, PU_COORDS.lon], { icon: puIcon }).addTo(commuteMapInstance);
+          puMarker.bindPopup(`<strong>Pwani University</strong><br>Main Campus Gate (Highway B8 Entrance)`);
+
+          // Draw real road walking route to PU Gate
+          const coords = (puRoute && puRoute.coordinates && puRoute.coordinates.length > 0)
+            ? puRoute.coordinates
+            : [[propLat, propLon], [PU_COORDS.lat, PU_COORDS.lon]];
+
+          puPolyline = L.polyline(coords, {
+            color: '#ffb400',
+            weight: 4,
+            opacity: 0.9,
+            lineJoin: 'round',
+            dashArray: (puRoute && puRoute.isRealRoad) ? null : '6, 8'
+          }).addTo(commuteMapInstance);
+
+          puPolyline.bindPopup(`<strong>Walking Route to PU Gate</strong><br>Direct road navigation`);
+
+          const bounds = L.latLngBounds(coords);
+          commuteMapInstance.fitBounds(bounds, { padding: [35, 35] });
+
+          // Interactive Map Tap: click anywhere to place or move user pin!
+          commuteMapInstance.on('click', function(ev) {
+            processUserLocation(ev.latlng.lat, ev.latlng.lng, true);
+          });
+
+          setTimeout(() => {
+            commuteMapInstance.invalidateSize();
+          }, 250);
+        });
+      }
+
+      window.requestUserLocationCommute = function() {
+        const btn = document.getElementById('btnRequestUserLoc');
+        const feedback = document.getElementById('userLocFeedback');
+        const ispNotice = document.getElementById('userLocIspNotice');
+
+        if (!navigator.geolocation) {
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.textContent = 'Geolocation is not supported by your browser.';
+          }
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<span style="display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></span> Acquiring GPS fix...`;
+        if (feedback) feedback.style.display = 'none';
+        if (ispNotice) ispNotice.style.display = 'none';
+
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            await processUserLocation(pos.coords.latitude, pos.coords.longitude, false);
+          },
+          (err) => {
+            btn.disabled = false;
+            btn.innerHTML = `<span>Try Again</span>`;
+            if (feedback) {
+              feedback.style.display = 'block';
+              if (err.code === err.PERMISSION_DENIED) {
+                feedback.textContent = 'Location access denied. Enable location permissions in your browser to see your live commute.';
+              } else {
+                feedback.textContent = 'Unable to determine your GPS location. Please try again or tap the map to position your pin.';
+              }
+            }
+          },
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+      };
+
+      async function processUserLocation(uLat, uLon, isManualPin) {
+        if (!currentProperty) return;
+        const pLat = parseFloat(currentProperty.latitude);
+        const pLon = parseFloat(currentProperty.longitude);
+        if (isNaN(pLat) || isNaN(pLon)) return;
+
+        const btn = document.getElementById('btnRequestUserLoc');
+        const feedback = document.getElementById('userLocFeedback');
+        const ispNotice = document.getElementById('userLocIspNotice');
+        const userWalkEta = document.getElementById('userWalkEta');
+        const userDistance = document.getElementById('userDistance');
+        const legendUser = document.getElementById('legendUser');
+
+        if (feedback) feedback.style.display = 'none';
+        if (btn) btn.style.display = 'none';
+        if (legendUser) legendUser.style.display = 'inline-flex';
+
+        userWalkEta.textContent = 'Routing...';
+        userDistance.textContent = 'Calculating walking route...';
+
+        // Check if browser geolocation reported Mombasa/far away (common with desktop Wi-Fi IP routing)
+        const straightKm = calculateDistanceKm(uLat, uLon, pLat, pLon);
+        const isFarAway = straightKm > 30; // Kilifi is ~55km north of Mombasa
+
+        if (ispNotice) {
+          if (isFarAway && !isManualPin) {
+            ispNotice.style.display = 'block';
+            ispNotice.innerHTML = `
+              <strong>Network Routing Notice (~${Math.round(straightKm)} km reported)</strong>
+              <span>Desktop Wi-Fi connections in Kenya frequently route through regional fiber gateways. Drag the blue location pin or tap anywhere on the Kilifi map to position your actual spot.</span>
+              <div class="commute-isp-actions">
+                <button type="button" class="btn-isp-action" onclick="setUserLocationPreset('pu_gate')">Pin near PU Gate</button>
+                <button type="button" class="btn-isp-action" onclick="setUserLocationPreset('kilifi_town')">Pin in Kilifi Town</button>
+              </div>
+            `;
+          } else {
+            ispNotice.style.display = 'none';
+          }
+        }
+
+        // Fetch real walking route from user's coordinates to property
+        const userRoute = await fetchWalkingRoute(uLat, uLon, pLat, pLon);
+        const { distFormatted, timeFormatted } = formatRouteCommute(userRoute.distanceMeters);
+
+        userWalkEta.textContent = timeFormatted;
+        userDistance.textContent = `${distFormatted} walk to property ${isManualPin ? '(drag pin to move)' : ''}`;
+
+        // Add or update draggable user pin on mini-map
+        if (commuteMapInstance && typeof L !== 'undefined') {
+          const userIcon = L.divIcon({
+            className: 'custom-user-pin',
+            html: `<div style="background:#2563eb; color:#fff; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(37,99,235,0.4); border:2px solid #fff; cursor:grab;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            </div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+          });
+
+          if (userMarker) {
+            userMarker.setLatLng([uLat, uLon]);
+          } else {
+            userMarker = L.marker([uLat, uLon], {
+              icon: userIcon,
+              draggable: true,
+              title: 'Drag me to position your spot'
+            }).addTo(commuteMapInstance);
+
+            userMarker.bindPopup('<strong>Your Location</strong><br>Drag me anywhere in Kilifi to recalculate walking route!').openPopup();
+
+            userMarker.on('dragend', async function(ev) {
+              const pos = ev.target.getLatLng();
+              await processUserLocation(pos.lat, pos.lng, true);
+            });
+          }
+
+          // Add / update real road route polyline from user to property
+          if (userRoutePolyline) {
+            try { commuteMapInstance.removeLayer(userRoutePolyline); } catch(e) {}
+          }
+
+          userRoutePolyline = L.polyline(userRoute.coordinates, {
+            color: '#3b82f6',
+            weight: 4,
+            opacity: 0.9,
+            lineJoin: 'round',
+            dashArray: userRoute.isRealRoad ? null : '6, 8'
+          }).addTo(commuteMapInstance);
+
+          userRoutePolyline.bindPopup(`<strong>Your Walking Route</strong><br>${distFormatted} • ${timeFormatted}`);
+
+          if (!isFarAway || isManualPin) {
+            const allBounds = L.latLngBounds([
+              [pLat, pLon],
+              [PU_COORDS.lat, PU_COORDS.lon],
+              [uLat, uLon]
+            ]);
+            commuteMapInstance.fitBounds(allBounds, { padding: [35, 35] });
+          }
+        }
+      }
+
+      window.setUserLocationPreset = async function(type) {
+        if (type === 'pu_gate') {
+          // Point right outside PU Gate
+          await processUserLocation(-3.62074, 39.84390, true);
+        } else if (type === 'kilifi_town') {
+          // Kilifi Town Center / Roundabout
+          await processUserLocation(-3.63000, 39.85100, true);
+        }
+      };
+
+      // Fullscreen Lightbox Functions with Thumbnails & Gestures
       window.openLightbox = function(idx) {
         if (!galleryImages || galleryImages.length === 0) return;
         currentLightboxIdx = idx;
         const modal = document.getElementById('lightboxModal');
         const img = document.getElementById('lightboxImg');
         const counter = document.getElementById('lightboxCounter');
+        const titleEl = document.getElementById('lightboxTitle');
+
+        if (titleEl && currentProperty) {
+          titleEl.textContent = currentProperty.title || 'Property Photos';
+        }
+
         img.src = galleryImages[currentLightboxIdx];
         counter.textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
         modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        renderLightboxThumbs();
       };
 
-      window.closeLightbox = function(e) {
-        if (!e || e.target.id === 'lightboxModal' || e.target.classList.contains('lightbox-close-btn')) {
-          document.getElementById('lightboxModal').style.display = 'none';
+      function renderLightboxThumbs() {
+        const thumbsContainer = document.getElementById('lightboxThumbs');
+        if (!thumbsContainer) return;
+        thumbsContainer.innerHTML = galleryImages.map((src, i) => `
+          <div class="lightbox-thumb-item ${i === currentLightboxIdx ? 'active' : ''}" onclick="switchLightboxImage(${i})">
+            <img src="${src}" alt="Thumb ${i + 1}" />
+          </div>
+        `).join('');
+
+        const activeThumb = thumbsContainer.querySelector('.lightbox-thumb-item.active');
+        if (activeThumb) {
+          activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
+      }
+
+      window.switchLightboxImage = function(idx) {
+        if (idx < 0 || idx >= galleryImages.length) return;
+        currentLightboxIdx = idx;
+        const img = document.getElementById('lightboxImg');
+        const counter = document.getElementById('lightboxCounter');
+        img.src = galleryImages[currentLightboxIdx];
+        counter.textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
+        renderLightboxThumbs();
+      };
+
+      window.closeLightbox = function() {
+        const modal = document.getElementById('lightboxModal');
+        if (modal) modal.style.display = 'none';
+        document.body.style.overflow = '';
       };
 
       window.prevLightboxImage = function(e) {
         if (e) e.stopPropagation();
         if (galleryImages.length <= 1) return;
         currentLightboxIdx = (currentLightboxIdx - 1 + galleryImages.length) % galleryImages.length;
-        document.getElementById('lightboxImg').src = galleryImages[currentLightboxIdx];
-        document.getElementById('lightboxCounter').textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
+        window.switchLightboxImage(currentLightboxIdx);
       };
 
       window.nextLightboxImage = function(e) {
         if (e) e.stopPropagation();
         if (galleryImages.length <= 1) return;
         currentLightboxIdx = (currentLightboxIdx + 1) % galleryImages.length;
-        document.getElementById('lightboxImg').src = galleryImages[currentLightboxIdx];
-        document.getElementById('lightboxCounter').textContent = `${currentLightboxIdx + 1} / ${galleryImages.length}`;
+        window.switchLightboxImage(currentLightboxIdx);
       };
 
-      // Payment Modal Functions
-      window.openPaymentModal = function(amount) {
+      // Keyboard arrow & escape navigation
+      window.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('lightboxModal');
+        if (!modal || modal.style.display !== 'flex') return;
+        if (e.key === 'ArrowLeft') {
+          prevLightboxImage();
+        } else if (e.key === 'ArrowRight') {
+          nextLightboxImage();
+        } else if (e.key === 'Escape') {
+          closeLightbox();
+        }
+      });
+
+      // Mobile Touch Swipe Handling
+      let touchStartX = 0;
+      let touchEndX = 0;
+      const stage = document.getElementById('lightboxStage');
+      if (stage) {
+        stage.addEventListener('touchstart', function(e) {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        stage.addEventListener('touchend', function(e) {
+          touchEndX = e.changedTouches[0].screenX;
+          const diff = touchEndX - touchStartX;
+          if (diff > 45) {
+            prevLightboxImage();
+          } else if (diff < -45) {
+            nextLightboxImage();
+          }
+        }, { passive: true });
+      }
+
+      // Payment Modal Functions & State Machine
+      let paymentPollTimer = null;
+      let paymentCountdownTimer = null;
+      let activeCheckoutRequestId = null;
+      let activePaymentPhone = '';
+      let activePaymentAmount = '';
+
+      function clearPaymentTimers() {
+        if (paymentPollTimer) {
+          clearInterval(paymentPollTimer);
+          paymentPollTimer = null;
+        }
+        if (paymentCountdownTimer) {
+          clearInterval(paymentCountdownTimer);
+          paymentCountdownTimer = null;
+        }
+      }
+
+      // Payment Plan Selection State ('rent' = 1st month rent only, 'full' = rent + deposit)
+      let selectedPaymentPlan = 'rent';
+
+      window.selectPaymentPlan = function(plan) {
+        selectedPaymentPlan = plan;
+        const rentOpt = document.getElementById('planOptionRent');
+        const fullOpt = document.getElementById('planOptionFull');
+        const radioRent = document.getElementById('radioRent');
+        const radioFull = document.getElementById('radioFull');
+
+        if (rentOpt) rentOpt.classList.toggle('selected', plan === 'rent');
+        if (fullOpt) fullOpt.classList.toggle('selected', plan === 'full');
+        if (radioRent) radioRent.checked = (plan === 'rent');
+        if (radioFull) radioFull.checked = (plan === 'full');
+
+        const rent = currentProperty ? Number(currentProperty.rent_amount || 0) : 0;
+        const totalDue = plan === 'full' ? rent * 2 : rent;
+        const dueLabel = document.getElementById('breakdownDueLabel');
+        const dueVal = document.getElementById('breakdownDueVal');
+        const btnText = document.getElementById('btnSidebarReserveText');
+
+        if (dueLabel) {
+          dueLabel.textContent = plan === 'full' ? 'Total Due Today (Rent + Deposit)' : 'Total Due Today (1st Month)';
+        }
+        if (dueVal) {
+          dueVal.textContent = `KES ${totalDue.toLocaleString()}`;
+        }
+        if (btnText) {
+          btnText.textContent = plan === 'full'
+            ? `Pay Full Move-in • KES ${totalDue.toLocaleString()}`
+            : `Reserve via M-Pesa • KES ${totalDue.toLocaleString()}`;
+        }
+      };
+
+      window.openPaymentModalWithPlan = function() {
+        window.openPaymentModal(selectedPaymentPlan);
+      };
+
+      window.switchModalPlan = function(plan) {
+        selectedPaymentPlan = plan;
+        const rentBtn = document.getElementById('modalPlanRentBtn');
+        const fullBtn = document.getElementById('modalPlanFullBtn');
+        if (rentBtn) rentBtn.classList.toggle('active', plan === 'rent');
+        if (fullBtn) fullBtn.classList.toggle('active', plan === 'full');
+
+        const rent = currentProperty ? Number(currentProperty.rent_amount || 0) : 0;
+        const amount = plan === 'full' ? (rent * 2) : rent;
+
+        const amountInput = document.getElementById('mpesaAmount');
+        const noticeSpan = document.getElementById('mpesaPlanNotice');
+        if (amountInput) amountInput.value = amount;
+        if (noticeSpan) {
+          noticeSpan.textContent = plan === 'full'
+            ? 'Full Move-in (Rent + Deposit)'
+            : '1st Month Rent (Deposit on move-in)';
+        }
+
+        // Keep sidebar synchronized
+        selectPaymentPlan(plan);
+      };
+
+      window.openPaymentModal = function(planOrAmount = 'rent') {
+        clearPaymentTimers();
         const modal = document.getElementById('paymentModal');
-        document.getElementById('mpesaAmount').value = amount;
+
+        const rent = currentProperty ? Number(currentProperty.rent_amount || 0) : 0;
+        const full = rent * 2;
+
+        if (planOrAmount === 'full' || planOrAmount === full) {
+          selectedPaymentPlan = 'full';
+        } else {
+          selectedPaymentPlan = 'rent';
+        }
+
+        // Update modal plan values
+        const rentVal = document.getElementById('modalRentAmountVal');
+        const fullVal = document.getElementById('modalFullAmountVal');
+        if (rentVal) rentVal.textContent = `KES ${rent.toLocaleString()}`;
+        if (fullVal) fullVal.textContent = `KES ${full.toLocaleString()}`;
+
+        // Switch to the selected plan
+        switchModalPlan(selectedPaymentPlan);
+
+        // Show form section, hide status section
+        document.getElementById('paymentFormSection').style.display = 'block';
+        const statusSec = document.getElementById('paymentStatusSection');
+        if (statusSec) {
+          statusSec.style.display = 'none';
+          statusSec.innerHTML = '';
+        }
+        const feedback = document.getElementById('paymentFeedback');
+        if (feedback) {
+          feedback.style.display = 'none';
+          feedback.innerHTML = '';
+        }
+        const btn = document.getElementById('btnConfirmPay');
+        if (btn) {
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span id="btnConfirmPayText">Send M-Pesa Prompt</span>
+          `;
+        }
         modal.style.display = 'flex';
       };
 
       window.closePaymentModal = function() {
+        clearPaymentTimers();
         document.getElementById('paymentModal').style.display = 'none';
       };
 
+      window.showPaymentForm = function() {
+        clearPaymentTimers();
+        document.getElementById('paymentStatusSection').style.display = 'none';
+        document.getElementById('paymentFormSection').style.display = 'block';
+        const btn = document.getElementById('btnConfirmPay');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span id="btnConfirmPayText">Send M-Pesa Prompt</span>
+          `;
+        }
+      };
+
+      // State Renderers for paymentStatusSection
+      function renderWaitingState(phone, amount, totalDuration = 60) {
+        const formSec = document.getElementById('paymentFormSection');
+        const statusSec = document.getElementById('paymentStatusSection');
+        formSec.style.display = 'none';
+        statusSec.style.display = 'block';
+
+        statusSec.innerHTML = `
+          <div class="stk-status-box">
+            <div class="stk-icon-circle stk-icon-waiting">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+            </div>
+
+            <div class="stk-timer-pill" id="stkTimerPill">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="stkTimerText">01:00 remaining</span>
+            </div>
+
+            <div class="stk-timer-progress-wrap">
+              <div id="stkProgressBar" class="stk-timer-progress-bar" style="width: 100%;"></div>
+            </div>
+
+            <div>
+              <h4 style="font-size:1.15rem; font-weight:700; margin:0 0 0.35rem 0; color:var(--text-primary);">Check Your Phone Screen</h4>
+              <p style="font-size:0.86rem; color:var(--text-secondary); margin:0; line-height:1.45;">
+                We sent a secure prompt for <strong>KES ${Number(amount).toLocaleString()}</strong> to <strong>${phone}</strong>.
+              </p>
+            </div>
+
+            <div style="background:var(--bg-tertiary); border:1px solid var(--border-color); border-radius:12px; padding:0.9rem 1rem; width:100%; text-align:left; font-size:0.82rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="width:18px; height:18px; border-radius:50%; background:#00A352; color:#fff; font-size:0.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</span>
+                <span>Unlock phone & look for Safaricom SIM prompt</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="width:18px; height:18px; border-radius:50%; background:#00A352; color:#fff; font-size:0.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</span>
+                <span>Enter your 4-digit secret M-Pesa PIN</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="width:18px; height:18px; border-radius:50%; background:#00A352; color:#fff; font-size:0.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">3</span>
+                <span>Press OK / Send to confirm</span>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; width:100%; margin-top:0.5rem;">
+              <button onclick="showPaymentForm()" style="flex:1; padding:0.65rem; background:none; border:1px solid var(--border-color); border-radius:10px; color:var(--text-secondary); font-size:0.85rem; font-weight:600; cursor:pointer; transition:background 0.2s;">
+                Change Number / Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderCancelledState(data) {
+        clearPaymentTimers();
+        const statusSec = document.getElementById('paymentStatusSection');
+        const reason = data && data.result_desc ? data.result_desc : 'Request cancelled by user';
+
+        statusSec.innerHTML = `
+          <div class="stk-status-box">
+            <div class="stk-icon-circle stk-icon-cancelled">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+            </div>
+
+            <div>
+              <span style="display:inline-block; font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#dc2626; background:#fef2f2; border:1px solid #fecaca; padding:3px 10px; border-radius:20px; margin-bottom:6px;">
+                Transaction Cancelled
+              </span>
+              <h4 style="font-size:1.15rem; font-weight:700; margin:0 0 0.35rem 0; color:var(--text-primary);">M-Pesa Prompt Dismissed</h4>
+              <p style="font-size:0.86rem; color:var(--text-secondary); margin:0; line-height:1.45;">
+                The authorization prompt was cancelled on the phone. No money has been deducted from your M-Pesa balance.
+              </p>
+            </div>
+
+            <div style="background:#fef2f2; border:1px solid #fee2e2; border-radius:10px; padding:0.75rem 1rem; width:100%; text-align:left; font-size:0.82rem; color:#991b1b;">
+              <strong>Safaricom Response:</strong> ${reason}
+            </div>
+
+            <div style="display:flex; gap:10px; width:100%; margin-top:0.5rem;">
+              <button onclick="showPaymentForm()" class="btn-reserve" style="flex:2; margin:0; padding:0.75rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span>Try Again</span>
+              </button>
+              <button onclick="closePaymentModal()" style="flex:1; padding:0.75rem; background:none; border:1px solid var(--border-color); border-radius:10px; color:var(--text-secondary); font-size:0.85rem; font-weight:600; cursor:pointer;">
+                Close
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderTimeoutState(phone, amount, customMsg = null) {
+        clearPaymentTimers();
+        const statusSec = document.getElementById('paymentStatusSection');
+
+        statusSec.innerHTML = `
+          <div class="stk-status-box">
+            <div class="stk-icon-circle stk-icon-timeout">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+
+            <div>
+              <span style="display:inline-block; font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#d97706; background:#fffbeb; border:1px solid #fde68a; padding:3px 10px; border-radius:20px; margin-bottom:6px;">
+                Timeout Exceeded
+              </span>
+              <h4 style="font-size:1.15rem; font-weight:700; margin:0 0 0.35rem 0; color:var(--text-primary);">Authorization Window Expired</h4>
+              <p style="font-size:0.86rem; color:var(--text-secondary); margin:0; line-height:1.45;">
+                ${customMsg || 'The 60-second M-Pesa PIN prompt expired before authorization was completed. Your funds were not touched.'}
+              </p>
+            </div>
+
+            <div style="background:#fffbeb; border:1px solid #fef3c7; border-radius:10px; padding:0.75rem 1rem; width:100%; text-align:left; font-size:0.82rem; color:#92400e;">
+              <strong>Tip:</strong> Keep your phone unlocked and nearby before clicking Resend so you can enter your PIN promptly.
+            </div>
+
+            <div style="display:flex; gap:10px; width:100%; margin-top:0.5rem;">
+              <button onclick="submitMpesaPayment()" class="btn-reserve" style="flex:2; margin:0; padding:0.75rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Resend M-Pesa Prompt</span>
+              </button>
+              <button onclick="showPaymentForm()" style="flex:1; padding:0.75rem; background:none; border:1px solid var(--border-color); border-radius:10px; color:var(--text-secondary); font-size:0.85rem; font-weight:600; cursor:pointer;">
+                Edit Details
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderSuccessState(data) {
+        clearPaymentTimers();
+        const statusSec = document.getElementById('paymentStatusSection');
+        const formattedDate = new Date().toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        // Update local property status
+        if (currentProperty) {
+          currentProperty.status = 'booked';
+          currentProperty.available = false;
+          renderDetailPage(currentProperty);
+        }
+
+        statusSec.innerHTML = `
+          <div class="stk-status-box">
+            <div class="stk-icon-circle stk-icon-success">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+
+            <div>
+              <span style="display:inline-block; font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#059669; background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 10px; border-radius:20px; margin-bottom:6px;">
+                Verified Payment
+              </span>
+              <h4 style="font-size:1.25rem; font-weight:800; margin:0 0 0.35rem 0; color:var(--text-primary);">Reservation Confirmed!</h4>
+              <p style="font-size:0.86rem; color:var(--text-secondary); margin:0; line-height:1.45;">
+                Your accommodation booking has been approved and locked.
+              </p>
+            </div>
+
+            <div class="stk-receipt-table">
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">M-Pesa Receipt:</span>
+                <strong style="font-family:monospace; font-size:0.95rem; color:#00A352;">${data.mpesa_receipt_number || 'Confirmed'}</strong>
+              </div>
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">Amount Paid:</span>
+                <strong style="color:var(--text-primary);">KES ${Number(data.amount).toLocaleString()}</strong>
+              </div>
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">Package Selected:</span>
+                <strong style="color:var(--text-primary);">${selectedPaymentPlan === 'full' ? 'Full Move-in (Rent + Deposit)' : '1st Month Rent (Reservation)'}</strong>
+              </div>
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">Move-in Balance:</span>
+                <span style="font-weight:700; color:${selectedPaymentPlan === 'full' ? '#059669' : '#d97706'};">
+                  ${selectedPaymentPlan === 'full' ? 'KES 0 (Paid in Full)' : 'Deposit due on move-in day'}
+                </span>
+              </div>
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">Phone Number:</span>
+                <span style="font-weight:600; color:var(--text-primary);">${data.phone_number || activePaymentPhone}</span>
+              </div>
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">Status:</span>
+                <span style="color:#059669; font-weight:700; display:inline-flex; align-items:center; gap:3px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Booked & Reserved
+                </span>
+              </div>
+              <div class="stk-receipt-row">
+                <span style="color:var(--text-secondary);">Transaction Date:</span>
+                <span style="color:var(--text-secondary);">${formattedDate}</span>
+              </div>
+            </div>
+
+            <div style="background:rgba(0,163,82,0.06); border:1px solid rgba(0,163,82,0.2); border-radius:10px; padding:0.75rem 1rem; width:100%; text-align:left; font-size:0.82rem; color:#065f46;">
+              <strong>Landlord Notified:</strong> A confirmation SMS and dashboard alert have been dispatched. You can now contact the landlord directly.
+            </div>
+
+            <div style="width:100%; margin-top:0.5rem;">
+              <button onclick="closePaymentModal()" class="btn-reserve" style="width:100%; margin:0; padding:0.85rem; background:#10b981;">
+                <span>Done & View Listing</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderFailedState(data) {
+        clearPaymentTimers();
+        const statusSec = document.getElementById('paymentStatusSection');
+        const reason = data && data.result_desc ? data.result_desc : 'Transaction could not be completed';
+
+        statusSec.innerHTML = `
+          <div class="stk-status-box">
+            <div class="stk-icon-circle stk-icon-cancelled">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+
+            <div>
+              <span style="display:inline-block; font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#dc2626; background:#fef2f2; border:1px solid #fecaca; padding:3px 10px; border-radius:20px; margin-bottom:6px;">
+                Payment Failed
+              </span>
+              <h4 style="font-size:1.15rem; font-weight:700; margin:0 0 0.35rem 0; color:var(--text-primary);">Transaction Declined</h4>
+              <p style="font-size:0.86rem; color:var(--text-secondary); margin:0; line-height:1.45;">
+                Safaricom was unable to process this payment.
+              </p>
+            </div>
+
+            <div style="background:#fef2f2; border:1px solid #fee2e2; border-radius:10px; padding:0.75rem 1rem; width:100%; text-align:left; font-size:0.82rem; color:#991b1b;">
+              <strong>Safaricom Message:</strong> ${reason}
+            </div>
+
+            <div style="display:flex; gap:10px; width:100%; margin-top:0.5rem;">
+              <button onclick="showPaymentForm()" class="btn-reserve" style="flex:2; margin:0; padding:0.75rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span>Retry Payment</span>
+              </button>
+              <button onclick="closePaymentModal()" style="flex:1; padding:0.75rem; background:none; border:1px solid var(--border-color); border-radius:10px; color:var(--text-secondary); font-size:0.85rem; font-weight:600; cursor:pointer;">
+                Close
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
       window.submitMpesaPayment = async function() {
-        const phone = document.getElementById('mpesaPhone').value.trim();
-        const amount = document.getElementById('mpesaAmount').value.trim();
+        const phoneInput = document.getElementById('mpesaPhone');
+        const phone = phoneInput ? phoneInput.value.trim() : activePaymentPhone;
+        const amount = document.getElementById('mpesaAmount') ? document.getElementById('mpesaAmount').value.trim() : activePaymentAmount;
         const feedback = document.getElementById('paymentFeedback');
         const btn = document.getElementById('btnConfirmPay');
 
+        activePaymentPhone = phone;
+        activePaymentAmount = amount;
+
         if (!phone) {
-          feedback.style.display = 'block';
-          feedback.style.color = '#ef4444';
-          feedback.textContent = 'Please enter a valid phone number.';
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.background = '#fef2f2';
+            feedback.style.color = '#dc2626';
+            feedback.style.border = '1px solid #fecaca';
+            feedback.innerHTML = '<strong>Phone Number Required:</strong> Please enter a valid Kenyan number (e.g. 0712345678 or 0112345678).';
+          }
           return;
         }
 
-        btn.disabled = true;
-        btn.textContent = 'Initiating STK Push...';
-        feedback.style.display = 'block';
-        feedback.style.color = 'var(--text-secondary)';
-        feedback.textContent = 'Connecting to Safaricom Daraja gateway...';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span>Connecting to Daraja Gateway...</span>';
+        }
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.background = '#eff6ff';
+          feedback.style.color = '#1d4ed8';
+          feedback.style.border = '1px solid #bfdbfe';
+          feedback.innerHTML = '<strong>Initiating M-Pesa STK Push...</strong><br>Communicating with Safaricom gateway.';
+        }
 
         try {
-          const res = await fetch(`${getApiBase()}/api/properties/pay/`, {
+          const res = await fetch(`${getApiBase()}/api/payments/initiate/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, amount })
+            body: JSON.stringify({
+              phone: phone,
+              amount: amount,
+              property_id: currentProperty ? currentProperty.id : null,
+              payment_type: selectedPaymentPlan === 'full' ? 'deposit' : 'booking'
+            })
           });
+
           const data = await res.json();
-          feedback.style.color = '#10b981';
-          feedback.textContent = data.message || 'Payment prompt sent! Please enter your M-Pesa PIN on your phone.';
-          btn.textContent = 'Prompt Sent!';
-          setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = 'Send M-Pesa Prompt';
-          }, 4000);
+
+          if (!res.ok) {
+            const errDetail = data.details ? Object.values(data.details).flat().join(' ') : (data.error || 'Payment initiation failed.');
+            throw new Error(errDetail);
+          }
+
+          const checkoutRequestId = data.checkout_request_id;
+          activeCheckoutRequestId = checkoutRequestId;
+
+          // Transition to Waiting State with live Countdown
+          const totalDuration = 60;
+          let remainingSeconds = totalDuration;
+          renderWaitingState(data.phone || phone, amount, totalDuration);
+
+          // Start 1-second countdown timer
+          paymentCountdownTimer = setInterval(() => {
+            remainingSeconds--;
+            const timerText = document.getElementById('stkTimerText');
+            const progressBar = document.getElementById('stkProgressBar');
+
+            if (timerText) {
+              const mins = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
+              const secs = String(remainingSeconds % 60).padStart(2, '0');
+              timerText.textContent = `${mins}:${secs} remaining`;
+            }
+
+            if (progressBar) {
+              const pct = Math.max(0, (remainingSeconds / totalDuration) * 100);
+              progressBar.style.width = `${pct}%`;
+              if (remainingSeconds <= 15) {
+                progressBar.style.backgroundColor = '#f59e0b';
+              }
+              if (remainingSeconds <= 5) {
+                progressBar.style.backgroundColor = '#ef4444';
+              }
+            }
+
+            if (remainingSeconds <= 0) {
+              clearPaymentTimers();
+              renderTimeoutState(data.phone || phone, amount);
+            }
+          }, 1000);
+
+          // Start Polling every 2.5 seconds
+          paymentPollTimer = setInterval(async () => {
+            try {
+              const statusRes = await fetch(`${getApiBase()}/api/payments/status/${checkoutRequestId}/`);
+              if (!statusRes.ok) return;
+              const statusData = await statusRes.json();
+
+              if (statusData.status === 'COMPLETED') {
+                renderSuccessState(statusData);
+              } else if (statusData.status === 'CANCELLED') {
+                renderCancelledState(statusData);
+              } else if (statusData.status === 'FAILED') {
+                if (statusData.result_code === 1037 || (statusData.result_desc && statusData.result_desc.toLowerCase().includes('timeout'))) {
+                  renderTimeoutState(data.phone || phone, amount, statusData.result_desc);
+                } else {
+                  renderFailedState(statusData);
+                }
+              }
+            } catch (pollErr) {
+              console.warn("Status polling error:", pollErr);
+            }
+          }, 2500);
+
         } catch (err) {
-          feedback.style.color = '#ef4444';
-          feedback.textContent = 'Payment initiation error. Please try again.';
-          btn.disabled = false;
-          btn.textContent = 'Send M-Pesa Prompt';
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.background = '#fef2f2';
+            feedback.style.color = '#dc2626';
+            feedback.style.border = '1px solid #fecaca';
+
+            let helpNotice = '';
+            if (err.message && (err.message.toLowerCase().includes('time') || err.message.toLowerCase().includes('slow'))) {
+              helpNotice = '<div style="margin-top:6px; font-size:0.8rem; color:#4b5563;">Safaricom Daraja sandbox servers experienced momentary latency. Click below to retry.</div>';
+            }
+
+            feedback.innerHTML = `<strong>Payment Initiation Issue:</strong><br>${err.message || 'Payment initiation failed. Please try again.'}${helpNotice}`;
+          }
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Retry Lipa na M-Pesa</span>
+            `;
+          }
         }
       };
 
@@ -1166,7 +2987,7 @@
       window.shareListing = function() {
         if (navigator.share) {
           navigator.share({
-            title: currentProperty ? currentProperty.title : 'NyumbaHub Property',
+            title: currentProperty ? currentProperty.title : 'TapIn Property',
             url: window.location.href
           }).catch(() => {});
         } else {
@@ -1185,10 +3006,10 @@
       }
     })();
     </script>
+    <div id="footer"></div>
   </div>
 
-  <div id="footer"></div>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/htmx.min.js"></script>
   <script src="js/head-support.js"></script>
   <script src="js/layout.js"></script>

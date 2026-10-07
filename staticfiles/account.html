@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Profile | NyumbaHub</title>
+  <title>My Profile | TapIn</title>
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="styles/global-ui.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -619,7 +619,7 @@
             </h2>
           </div>
           <p style="color: var(--text-secondary); margin-bottom: 1.25rem;">
-            Welcome to NyumbaHub! Explore verified hostels, studios, and rental flats across your desired locations.
+            Welcome to TapIn! Explore verified hostels, studios, and rental flats across your desired locations.
           </p>
           <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
             <a href="index.html" hx-get="index.html" class="btn-action btn-gold">Browse Verified Houses</a>
@@ -631,7 +631,7 @@
         <div style="text-align: center; margin-top: 2rem;">
           <button class="btn-action btn-danger" onclick="logout()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            Sign Out of NyumbaHub
+            Sign Out of TapIn
           </button>
         </div>
       </div>
@@ -639,12 +639,11 @@
       <div id="unauthPrompt" style="display:none; text-align:center; padding: 4rem 1rem;">
         <h2 style="font-size:1.5rem; margin-bottom:0.8rem;">You are not signed in</h2>
         <p style="color: var(--text-secondary); margin-bottom:1.5rem;">Please log in to manage your student profile or property portfolio.</p>
-        <a href="login.html" hx-get="login.html" class="btn-action btn-gold">Log In to NyumbaHub</a>
+        <a href="login.html" hx-get="login.html" class="btn-action btn-gold">Log In to TapIn</a>
       </div>
     </main>
-  </div>
 
-  <div id="footer"></div>
+    <div id="footer"></div>
 
   <script>
   (function() {
@@ -674,15 +673,32 @@
     };
 
     window.navToPropertyDetail = function(id) {
+      if (!id) return;
+      const strId = String(id);
+      window._currentPropertyId = strId;
+      try { sessionStorage.setItem('current_property_id', strId); } catch(e) {}
+      const targetUrl = `property-detail.html?id=${strId}`;
+      if (window.history && window.history.pushState) {
+        window.history.pushState({ page: 'property-detail', id: strId }, '', targetUrl);
+      }
+      const swap = document.getElementById('content-swap');
+      if (swap) swap.dataset.propertyId = strId;
+
       if (window.htmx) {
-        window.htmx.ajax('GET', `property-detail.html?id=${id}`, { target: '#content-swap', select: '#content-swap', swap: 'outerHTML show:window:top', pushUrl: true });
-      } else { window.location.href = `property-detail.html?id=${id}`; }
+        window.htmx.ajax('GET', targetUrl, { target: '#content-swap', select: '#content-swap', swap: 'outerHTML show:window:top' });
+      } else { window.location.href = targetUrl; }
     };
 
     window.navToEditProperty = function(id) {
+      if (!id) return;
+      const strId = String(id);
+      const targetUrl = `add-property.html?id=${strId}`;
+      if (window.history && window.history.pushState) {
+        window.history.pushState({ page: 'add-property', id: strId }, '', targetUrl);
+      }
       if (window.htmx) {
-        window.htmx.ajax('GET', `add-property.html?id=${id}`, { target: '#content-swap', select: '#content-swap', swap: 'outerHTML show:window:top', pushUrl: true });
-      } else { window.location.href = `add-property.html?id=${id}`; }
+        window.htmx.ajax('GET', targetUrl, { target: '#content-swap', select: '#content-swap', swap: 'outerHTML show:window:top' });
+      } else { window.location.href = targetUrl; }
     };
 
     function showAlert(msg, type='success') {
@@ -712,7 +728,7 @@
     }
 
     async function initAccountPage() {
-      const token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
+      let token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
       const loadingEl = document.getElementById('accountLoading');
       const containerEl = document.getElementById('accountContainer');
       const unauthEl = document.getElementById('unauthPrompt');
@@ -723,26 +739,46 @@
         return;
       }
 
+      // STALE-WHILE-REVALIDATE: Render cached profile immediately so there is zero delay/spinner
+      const cachedUser = typeof getUserData === 'function' ? getUserData() : JSON.parse(localStorage.getItem('user') || 'null');
+      if (cachedUser) {
+        renderUserProfile(cachedUser);
+      }
+
       // Fetch fresh profile from /api/auth/me/
       try {
-        const res = await fetch(`${getApiBase()}/api/auth/me/`, {
+        let res = await fetch(`${getApiBase()}/api/auth/me/`, {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
-        if (!res.ok) {
-          if (loadingEl) loadingEl.style.display = 'none';
-          if (unauthEl) unauthEl.style.display = 'block';
-          return;
+
+        // If token expired, attempt refresh
+        if (res.status === 401 && typeof refreshTokenIfNeeded === 'function') {
+          const newToken = await refreshTokenIfNeeded();
+          if (newToken) {
+            token = newToken;
+            res = await fetch(`${getApiBase()}/api/auth/me/`, {
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+            });
+          }
         }
 
-        const user = await res.json();
-        if (typeof setUserData === 'function') setUserData(user);
-        else localStorage.setItem('user', JSON.stringify(user));
-
-        renderUserProfile(user);
+        if (res.ok) {
+          const user = await res.json();
+          if (typeof setUserData === 'function') setUserData(user);
+          else localStorage.setItem('user', JSON.stringify(user));
+          renderUserProfile(user);
+        } else if (res.status === 401) {
+          if (!cachedUser) {
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (unauthEl) unauthEl.style.display = 'block';
+          }
+        }
       } catch (e) {
-        console.error('Profile fetch failed:', e);
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (unauthEl) unauthEl.style.display = 'block';
+        console.warn('Profile background re-fetch failed (using cached data):', e);
+        if (!cachedUser) {
+          if (loadingEl) loadingEl.style.display = 'none';
+          if (unauthEl) unauthEl.style.display = 'block';
+        }
       }
     }
 
@@ -959,6 +995,7 @@
     }
   })();
   </script>
+  </div>
 
   <script src="js/htmx.min.js"></script>
   <script src="js/head-support.js"></script>

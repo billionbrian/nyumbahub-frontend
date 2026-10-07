@@ -79,24 +79,30 @@ class PropertyViewSet(viewsets.ModelViewSet):
         # Force landlord to always be the authenticated user (client cannot override)
         property_obj = serializer.save(landlord=self.request.user)
         # Check if multiple images were submitted during creation
-        files = self.request.FILES.getlist('images')
+        files = self.request.FILES.getlist('images') or self.request.FILES.getlist('image')
         for idx, file in enumerate(files):
             PropertyImage.objects.create(
                 property=property_obj,
                 image=file,
                 is_primary=(idx == 0)
             )
+        if not property_obj.image and files:
+            property_obj.image = files[0]
+            property_obj.save(update_fields=['image'])
 
     def perform_update(self, serializer):
         # Ensure landlord cannot be transferred during update
         property_obj = serializer.save()
-        files = self.request.FILES.getlist('images')
+        files = self.request.FILES.getlist('images') or self.request.FILES.getlist('image')
         for idx, file in enumerate(files):
             PropertyImage.objects.create(
                 property=property_obj,
                 image=file,
                 is_primary=not property_obj.images.exists() and idx == 0
             )
+        if not property_obj.image and files:
+            property_obj.image = files[0]
+            property_obj.save(update_fields=['image'])
 
     @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser, JSONParser], permission_classes=[permissions.IsAuthenticated, IsLandlord, IsPropertyOwner])
     def upload_images(self, request, pk=None):

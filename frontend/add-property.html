@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Property Management | NyumbaHub</title>
+  <title>Property Management | TapIn</title>
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="styles/global-ui.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -558,11 +558,35 @@
         return 'http://localhost:8080';
       }
 
+      function ensureLeaflet(callback) {
+        if (typeof L !== 'undefined') {
+          callback();
+          return;
+        }
+        if (!document.querySelector('link[href*="leaflet.css"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          link.crossOrigin = '';
+          document.head.appendChild(link);
+        }
+        let script = document.querySelector('script[src*="leaflet.js"]');
+        if (!script) {
+          script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          script.crossOrigin = '';
+          script.onload = () => callback();
+          document.head.appendChild(script);
+        } else {
+          script.addEventListener('load', () => callback());
+        }
+      }
+
       async function initAddPropertyPage() {
         const container = document.getElementById('propertyFormContainer');
         if (!container) return;
 
-        const token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
+        let token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
         if (!token) {
           container.innerHTML = `
             <div class="auth-prompt-card">
@@ -577,31 +601,65 @@
           return;
         }
 
-        // Show verifying spinner while checking with /api/auth/me/
-        container.innerHTML = `
-          <div style="text-align:center; padding: 4rem 1rem; color: var(--text-secondary);">
-            <div style="display:inline-block; width:30px; height:30px; border:3px solid var(--border-color); border-top-color:var(--brand-primary); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:14px;"></div>
-            <p style="font-size:0.95rem; font-weight:500;">Verifying Landlord Account...</p>
-            <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-          </div>
-        `;
+        // Check URL parameters for edit mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id') || urlParams.get('edit');
+        const isEditMode = !!editId;
+
+        if (isEditMode) {
+          const heroTitle = document.getElementById('heroTitle');
+          const heroSubtitle = document.getElementById('heroSubtitle');
+          if (heroTitle) heroTitle.innerHTML = 'Update <span>Property</span>';
+          if (heroSubtitle) heroSubtitle.textContent = 'Modify listing details, adjust rent, or update your pin location.';
+        }
 
         let user = typeof getUserData === 'function' ? getUserData() : JSON.parse(localStorage.getItem('user') || 'null');
 
+        // INSTANT INITIALIZATION: If user is already cached as a landlord, render form immediately!
+        if (user && (user.role === 'landlord' || user.is_staff || user.is_superuser)) {
+          renderForm(isEditMode, editId);
+        } else {
+          container.innerHTML = `
+            <div style="text-align:center; padding: 4rem 1rem; color: var(--text-secondary);">
+              <div style="display:inline-block; width:30px; height:30px; border:3px solid var(--border-color); border-top-color:var(--brand-primary); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:14px;"></div>
+              <p style="font-size:0.95rem; font-weight:500;">Verifying Landlord Account...</p>
+              <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+            </div>
+          `;
+        }
+
         try {
-          const res = await fetch(`${getApiBase()}/api/auth/me/`, {
+          let res = await fetch(`${getApiBase()}/api/auth/me/`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
           });
+
+          if (res.status === 401 && typeof refreshTokenIfNeeded === 'function') {
+            const newToken = await refreshTokenIfNeeded();
+            if (newToken) {
+              token = newToken;
+              res = await fetch(`${getApiBase()}/api/auth/me/`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              });
+            }
+          }
+
           if (res.ok) {
             user = await res.json();
             if (typeof setUserData === 'function') setUserData(user);
             else localStorage.setItem('user', JSON.stringify(user));
+            // If form was not rendered yet, render it now
+            if (!document.getElementById('propertyEntryForm')) {
+              if (user.role === 'landlord' || user.is_staff || user.is_superuser) {
+                renderForm(isEditMode, editId);
+              }
+            }
           } else if (res.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
             container.innerHTML = `
               <div class="auth-prompt-card">
                 <span class="auth-prompt-icon">
@@ -615,7 +673,7 @@
             return;
           }
         } catch (e) {
-          console.warn('Network auth check failed, using local user data if available:', e);
+          console.warn('Network auth check failed, using cached user data:', e);
         }
 
         if (!user) {
@@ -639,7 +697,7 @@
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
               </span>
               <h3>Tenant Account Detected</h3>
-              <p>You are signed in as <strong>@${user.username}</strong> (${user.email || 'Student/Tenant'}). Only registered Landlord accounts can list properties on NyumbaHub.</p>
+              <p>You are signed in as <strong>@${user.username}</strong> (${user.email || 'Student/Tenant'}). Only registered Landlord accounts can list properties on TapIn.</p>
               <div style="display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
                 <a href="signup.html" hx-get="signup.html" class="auth-prompt-btn">Register as Landlord →</a>
                 <button type="button" class="auth-prompt-btn" style="background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); cursor:pointer;" onclick="localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href='login.html';">Switch Account / Sign In</button>
@@ -649,19 +707,9 @@
           return;
         }
 
-        // Check URL parameters for edit mode
-        const urlParams = new URLSearchParams(window.location.search);
-        const editId = urlParams.get('id') || urlParams.get('edit');
-        const isEditMode = !!editId;
-
-        if (isEditMode) {
-          const heroTitle = document.getElementById('heroTitle');
-          const heroSubtitle = document.getElementById('heroSubtitle');
-          if (heroTitle) heroTitle.innerHTML = 'Update <span>Property</span>';
-          if (heroSubtitle) heroSubtitle.textContent = 'Modify listing details, adjust rent, or update your pin location.';
+        if (!document.getElementById('propertyEntryForm')) {
+          renderForm(isEditMode, editId);
         }
-
-        renderForm(isEditMode, editId);
       }
 
       function renderForm(isEditMode, editId) {
@@ -842,7 +890,9 @@
           </form>
         `;
 
-        initMapLogic(isEditMode, editId);
+        ensureLeaflet(() => {
+          initMapLogic(isEditMode, editId);
+        });
       }
 
       function initMapLogic(isEditMode, editId) {
@@ -863,6 +913,12 @@
         // Default map center: Kilifi / Coast region (-3.6305, 39.8499)
         const defaultCenter = [-3.6305, 39.8499];
         const map = L.map('pickerMap').setView(defaultCenter, 13);
+
+        // Force Leaflet to recalculate canvas dimensions after DOM insertion
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 250);
+        window.addEventListener('resize', () => map.invalidateSize());
 
         // Google Streets: Clean, modern, high-speed map with zero API keys required
         const streetLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
@@ -907,14 +963,39 @@
         const btnSearch = document.getElementById('btnExecSearch');
         const btnGps = document.getElementById('btnGpsLocate');
 
+        function createPropertyPinIcon() {
+          return L.divIcon({
+            className: 'custom-property-pin-wrap',
+            html: `
+              <div style="filter: drop-shadow(0 5px 12px rgba(0,0,0,0.45)); cursor:grab;">
+                <svg width="38" height="48" viewBox="0 0 38 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Location shaped pin background in theme color -->
+                  <path d="M19 1C9.61 1 2 8.61 2 18C2 30.8 19 47 19 47C19 47 36 30.8 36 18C36 8.61 28.39 1 19 1Z" fill="#ffb400" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                  <!-- Rounded house icon inside -->
+                  <g transform="translate(9, 7.5)">
+                    <path d="M10 2.4C9.55 2 8.85 2 8.4 2.4L2.3 7.85C1.85 8.25 2.15 9 2.75 9H3.5V17C3.5 17.83 4.17 18.5 5 18.5H15C15.83 18.5 16.5 17.83 16.5 17V9H17.25C17.85 9 18.15 8.25 17.7 7.85L11.6 2.4C11.15 2 10.45 2 10 2.4Z" fill="#18181b"/>
+                    <rect x="8" y="11" width="4" height="7.5" rx="1.5" fill="#ffb400"/>
+                    <circle cx="10" cy="6.2" r="1.2" fill="#ffb400"/>
+                  </g>
+                </svg>
+              </div>
+            `,
+            iconSize: [38, 48],
+            iconAnchor: [19, 48],
+            popupAnchor: [0, -48]
+          });
+        }
+
         function setPinPosition(lat, lon, zoomTo=false, customAddress=null) {
           selectedLat = parseFloat(lat.toFixed(6));
           selectedLon = parseFloat(lon.toFixed(6));
-          isConfirmed = false;
+          confirmedLat = selectedLat;
+          confirmedLon = selectedLon;
+          isConfirmed = true;
 
           // Update marker
           if (!currentMarker) {
-            currentMarker = L.marker([selectedLat, selectedLon], { draggable: true }).addTo(map);
+            currentMarker = L.marker([selectedLat, selectedLon], { icon: createPropertyPinIcon(), draggable: true }).addTo(map);
             currentMarker.on('dragend', function() {
               const pos = currentMarker.getLatLng();
               setPinPosition(pos.lat, pos.lng, false);
@@ -929,9 +1010,9 @@
 
           // UI readouts
           displayLatLon.textContent = `Coordinates: ${selectedLat}, ${selectedLon}`;
-          btnConfirm.disabled = false;
-          btnConfirm.style.display = 'inline-flex';
-          confirmedPill.style.display = 'none';
+          btnConfirm.style.display = 'none';
+          confirmedPill.style.display = 'inline-flex';
+          confirmedPill.textContent = '✓ Pin Location Set & Confirmed';
 
           if (customAddress) {
             displayAddress.textContent = customAddress;
@@ -1113,13 +1194,19 @@
         form.addEventListener('submit', async function(e) {
           e.preventDefault();
 
-          if (!isConfirmed || confirmedLat === null || confirmedLon === null) {
-            alert('Please select and confirm your property location on the map before publishing.');
-            document.querySelector('.location-picker-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return;
+          if (confirmedLat === null || confirmedLon === null) {
+            if (selectedLat !== null && selectedLon !== null) {
+              confirmedLat = selectedLat;
+              confirmedLon = selectedLon;
+              isConfirmed = true;
+            } else {
+              alert('Please place a location pin for your property on the map before publishing.');
+              document.querySelector('.location-picker-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+              return;
+            }
           }
 
-          const token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
+          let token = typeof getToken === 'function' ? getToken() : localStorage.getItem('token');
           const submitBtn = document.getElementById('btnSubmitForm');
           submitBtn.disabled = true;
           submitBtn.innerHTML = `<span>Saving Listing...</span>`;
@@ -1133,13 +1220,15 @@
           formData.append('bathrooms', parseInt(document.getElementById('propBathrooms').value));
           formData.append('status', document.getElementById('propStatus').value);
           formData.append('available', document.getElementById('propStatus').value === 'available');
-          if (confirmedLat !== null && confirmedLon !== null) {
-            formData.append('latitude', confirmedLat);
-            formData.append('longitude', confirmedLon);
-          }
+          formData.append('latitude', confirmedLat);
+          formData.append('longitude', confirmedLon);
+
           // Append uploaded image files
           for (let file of selectedImageFiles) {
             formData.append('images', file);
+          }
+          if (selectedImageFiles.length > 0) {
+            formData.append('image', selectedImageFiles[0]);
           }
 
           try {
@@ -1148,13 +1237,28 @@
               : `${getApiBase()}/api/properties/`;
             const method = isEditMode ? 'PATCH' : 'POST';
 
-            const res = await fetch(url, {
+            let res = await fetch(url, {
               method: method,
               headers: {
                 'Authorization': `Bearer ${token}`
               },
               body: formData
             });
+
+            // If token expired during form fill, auto-refresh and retry
+            if (res.status === 401 && typeof refreshTokenIfNeeded === 'function') {
+              const newToken = await refreshTokenIfNeeded();
+              if (newToken) {
+                token = newToken;
+                res = await fetch(url, {
+                  method: method,
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: formData
+                });
+              }
+            }
 
             const data = await res.json();
 

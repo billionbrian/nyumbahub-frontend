@@ -1,6 +1,6 @@
-# NyumbaHub Backend Documentation
+# TapIn Backend Documentation
 
-Welcome to the NyumbaHub backend documentation. This folder contains comprehensive documentation for the Django-based backend system.
+Welcome to the TapIn backend documentation. This folder contains comprehensive documentation for the Django-based backend system.
 
 ## Documentation Files
 

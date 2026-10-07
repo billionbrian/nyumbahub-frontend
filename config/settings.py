@@ -10,21 +10,25 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load .env file
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8q(b!eqn1q+)%8fq&+-e1y+=acm$^(srv=&v7-ipdbd+3r_(10'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8q(b!eqn1q+)%8fq&+-e1y+=acm$^(srv=&v7-ipdbd+3r_(10')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = ['*']
 
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
     'django_filters',
     'accounts',
     'properties',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -149,9 +154,9 @@ REST_FRAMEWORK = {
 
 # Simple JWT Configuration
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False,
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': True,
     'ALGORITHM': 'HS256',
@@ -187,6 +192,20 @@ CORS_ALLOW_CREDENTIALS = True
 # Geocoding Service Settings
 GEOCODING_PROVIDER = 'nominatim'
 GEOCODING_NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse'
-GEOCODING_NOMINATIM_USER_AGENT = 'NyumbaHub-StudentHousing/1.0 (admin@nyumbahub.test)'
+GEOCODING_NOMINATIM_USER_AGENT = 'TapIn-StudentHousing/1.0 (admin@tapin.test)'
 GEOCODING_TIMEOUT_SECONDS = 5
+
+# Safaricom Daraja M-Pesa Configuration
+MPESA_CONFIG = {
+    'ENVIRONMENT': os.getenv('MPESA_ENVIRONMENT', 'sandbox'),
+    'CONSUMER_KEY': os.getenv('MPESA_CONSUMER_KEY', ''),
+    'CONSUMER_SECRET': os.getenv('MPESA_CONSUMER_SECRET', ''),
+    'SHORTCODE': os.getenv('MPESA_SHORTCODE', '174379'),
+    'PASSKEY': os.getenv('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'),
+    'CALLBACK_URL': os.getenv('MPESA_CALLBACK_URL', 'https://sandbox.safaricom.co.ke/mpesa/'),
+    'TIMEOUT': int(os.getenv('MPESA_TIMEOUT', '30')),
+    'FALLBACK_ON_TIMEOUT': os.getenv('MPESA_FALLBACK_ON_TIMEOUT', 'True').lower() in ('true', '1', 'yes'),
+    'AUTO_CONFIRM_SIMULATION': os.getenv('MPESA_AUTO_CONFIRM_SIMULATION', 'True').lower() in ('true', '1', 'yes'),
+}
+
 

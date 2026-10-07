@@ -226,13 +226,15 @@ document.addEventListener('htmx:afterSwap', function(evt) {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 
-  // Determine current page from URL
+  // Determine current page from swapped data-page or URL
   const currentPath = window.location.pathname;
   const currentFile = currentPath.split('/').pop() || 'index.html';
-  const pageKey = (currentFile.replace('.html', '') || 'index').split('?')[0];
+  const urlPageKey = (currentFile.replace('.html', '') || 'index').split('?')[0];
+  const swapDataPage = swap ? swap.getAttribute('data-page') : null;
+  const pageKey = (swapDataPage && swapDataPage !== 'index') ? swapDataPage : urlPageKey;
 
-  // Update data-page on #content-swap so scoped styles (like map) work accurately
-  if (swap) {
+  // Update data-page on #content-swap so scoped styles work accurately
+  if (swap && !swap.getAttribute('data-page')) {
     swap.setAttribute('data-page', pageKey);
   }
 
@@ -277,10 +279,13 @@ document.addEventListener('htmx:historyRestore', function() {
 
   const currentPath = window.location.pathname;
   const currentFile = currentPath.split('/').pop() || 'index.html';
-  const pageKey = (currentFile.replace('.html', '') || 'index').split('?')[0];
+  const urlPageKey = (currentFile.replace('.html', '') || 'index').split('?')[0];
 
   const swap = document.getElementById('content-swap');
-  if (swap) {
+  const swapDataPage = swap ? swap.getAttribute('data-page') : null;
+  const pageKey = (swapDataPage && swapDataPage !== 'index') ? swapDataPage : urlPageKey;
+
+  if (swap && !swap.getAttribute('data-page')) {
     swap.setAttribute('data-page', pageKey);
   }
 

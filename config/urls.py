@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
     path('api/properties/', include('properties.urls')),
+    path('api/payments/', include('payments.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^(?!admin|api/|media/)(?P<file_path>.*)$', serve_frontend_file, name='serve_frontend_file'),
     re_path(r'^$', serve_frontend_file, name='serve_frontend_root'),

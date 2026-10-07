@@ -1,10 +1,10 @@
-# 🏠 NyumbaHub
+# 🏠 TapIn
 
 <div align="center">
 
 ### Find a Home Faster. Connect Landlords and Tenants Seamlessly.
 
-NyumbaHub is a modern property listing platform designed to help tenants find houses quickly while enabling landlords and property managers to advertise vacant properties efficiently.
+TapIn is a modern property listing platform designed to help tenants find houses quickly while enabling landlords and property managers to advertise vacant properties efficiently.
 
 </div>
 
@@ -12,7 +12,7 @@ NyumbaHub is a modern property listing platform designed to help tenants find ho
 
 ## 📖 Project Description
 
-NyumbaHub is a web-based housing marketplace focused on simplifying the rental process.
+TapIn is a web-based housing marketplace focused on simplifying the rental process.
 
 The platform allows:
 
@@ -372,4 +372,4 @@ Keep the code modular, scalable, and production-ready.
 
 Brian Billion
 
-NyumbaHub Project
+TapIn Project

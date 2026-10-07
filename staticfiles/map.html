@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Housing Map | NyumbaHub</title>
+  <title>Student Housing Map | TapIn</title>
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="styles/global-ui.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -345,41 +345,41 @@
     }
 
     /* Custom Leaflet Map Pins */
-    .custom-property-pin {
-      background: var(--card-bg, #ffffff);
-      color: var(--text-primary, #111827);
-      border: 2px solid var(--brand-primary, #ffb400);
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-weight: 700;
-      font-size: 11px;
-      white-space: nowrap;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
+    .custom-property-pin-wrap {
+      background: transparent !important;
+      border: none !important;
+    }
+
+    .nyumba-location-pin {
       position: relative;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
+      width: 38px;
+      height: 48px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
     }
 
-    .custom-property-pin:hover,
-    .custom-property-pin.pin-active {
-      background: var(--brand-primary, #ffb400);
-      color: #111827;
-      transform: scale(1.15);
+    .nyumba-location-pin .pin-teardrop {
+      fill: var(--brand-primary, #ffb400);
+      stroke: #ffffff;
+      transition: fill 0.2s ease;
+    }
+
+    .nyumba-location-pin .pin-house {
+      fill: #18181b;
+      transition: fill 0.2s ease;
+    }
+
+    .nyumba-location-pin .pin-house-cutout {
+      fill: var(--brand-primary, #ffb400);
+      transition: fill 0.2s ease;
+    }
+
+    .nyumba-location-pin:hover,
+    .nyumba-location-pin.pin-active {
+      transform: translateY(-5px) scale(1.18);
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65));
       z-index: 99999 !important;
-    }
-
-    .custom-property-pin::after {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-width: 6px 5px 0;
-      border-style: solid;
-      border-color: var(--brand-primary, #ffb400) transparent transparent;
     }
 
     /* User GPS Pulse Marker */
@@ -737,17 +737,28 @@
         }
 
         function createPinIcon(p) {
-          const rent = p.rent_amount ? Number(p.rent_amount) : 0;
-          let label = 'KES ' + (rent >= 1000 ? Math.round(rent / 1000) + 'K' : rent);
           return L.divIcon({
-            className: '',
-            html: `<div class="custom-property-pin" data-marker-id="${p.id}">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                    <span>${label}</span>
-                   </div>`,
-            iconSize: [60, 28],
-            iconAnchor: [30, 28],
-            popupAnchor: [0, -28]
+            className: 'custom-property-pin-wrap',
+            html: `
+              <div class="nyumba-location-pin" data-marker-id="${p.id}" title="${p.title || 'Property'}">
+                <svg width="38" height="48" viewBox="0 0 38 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Location shaped pin background in theme color -->
+                  <path class="pin-teardrop" d="M19 1C9.61 1 2 8.61 2 18C2 30.8 19 47 19 47C19 47 36 30.8 36 18C36 8.61 28.39 1 19 1Z" fill="#ffb400" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                  <!-- Rounded house icon inside -->
+                  <g transform="translate(9, 7.5)">
+                    <!-- Rounded Roof & House Silhouette -->
+                    <path class="pin-house" d="M10 2.4C9.55 2 8.85 2 8.4 2.4L2.3 7.85C1.85 8.25 2.15 9 2.75 9H3.5V17C3.5 17.83 4.17 18.5 5 18.5H15C15.83 18.5 16.5 17.83 16.5 17V9H17.25C17.85 9 18.15 8.25 17.7 7.85L11.6 2.4C11.15 2 10.45 2 10 2.4Z" fill="#18181b"/>
+                    <!-- Rounded Door Cutout -->
+                    <rect class="pin-house-cutout" x="8" y="11" width="4" height="7.5" rx="1.5" fill="#ffb400"/>
+                    <!-- Soft Attic Window -->
+                    <circle class="pin-house-cutout" cx="10" cy="6.2" r="1.2" fill="#ffb400"/>
+                  </g>
+                </svg>
+              </div>
+            `,
+            iconSize: [38, 48],
+            iconAnchor: [19, 48],
+            popupAnchor: [0, -48]
           });
         }
 

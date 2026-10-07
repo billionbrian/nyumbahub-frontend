@@ -2,7 +2,7 @@
 
 ## Overview
 
-NyumbaHub uses Django ORM (Object-Relational Mapping) for database operations. The database schema is defined through Django models in the `accounts` and `properties` applications.
+TapIn uses Django ORM (Object-Relational Mapping) for database operations. The database schema is defined through Django models in the `accounts` and `properties` applications.
 
 **Database Engine**: SQLite3 (development), PostgreSQL (production)
 
@@ -453,10 +453,10 @@ cp db.sqlite3.backup db.sqlite3
 
 ```bash
 # Backup
-pg_dump -U username -d nyumbahub_db > backup.sql
+pg_dump -U username -d tapin_db > backup.sql
 
 # Restore
-psql -U username -d nyumbahub_db < backup.sql
+psql -U username -d tapin_db < backup.sql
 ```
 
 ---

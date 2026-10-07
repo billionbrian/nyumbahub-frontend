@@ -29,15 +29,61 @@ function getUserData() {
 // the logout flow.session terminator
 function logout() {
     console.log('logout: Clearing session');
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (refreshToken) {
+        const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+            ? window.location.origin
+            : 'http://localhost:8080';
+        fetch(`${apiBase}/api/auth/logout/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken })
+        }).catch(() => {});
+    }
     localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     window.location.href = 'login.html';
 }
 
-// fetch current user data from backend
+// Automatically refresh token when access token expires
+async function refreshTokenIfNeeded() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) return null;
+
+    try {
+        console.log('refreshTokenIfNeeded: Attempting token refresh...');
+        const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
+            ? window.location.origin
+            : 'http://localhost:8080';
+        const response = await fetch(`${apiBase}/api/auth/token/refresh/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const newToken = data.access || data.token;
+            if (newToken) {
+                console.log('refreshTokenIfNeeded: Token refreshed successfully');
+                localStorage.setItem('token', newToken);
+                if (data.refresh) localStorage.setItem('refresh_token', data.refresh);
+                return newToken;
+            }
+        } else {
+            console.warn('refreshTokenIfNeeded: Refresh failed with status', response.status);
+        }
+    } catch (e) {
+        console.warn('refreshTokenIfNeeded: Network error during refresh', e);
+    }
+    return null;
+}
+
+// fetch current user data from backend with auto-refresh resilience
 async function fetchCurrentUser() {
     try {
-        const token = getToken();
+        let token = getToken();
         if (!token) {
             console.log('fetchCurrentUser: No token available');
             return null;
@@ -47,25 +93,46 @@ async function fetchCurrentUser() {
         const apiBase = (window.location.protocol.startsWith('http') && !['5500', '3000', '5173'].includes(window.location.port))
             ? window.location.origin
             : 'http://localhost:8080';
-        const response = await fetch(`${apiBase}/api/auth/me/`, {
+
+        let response = await fetch(`${apiBase}/api/auth/me/`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
 
+        // If 401 Unauthorized, attempt refresh
+        if (response.status === 401) {
+            console.log('fetchCurrentUser: 401 received, attempting refresh...');
+            const refreshedToken = await refreshTokenIfNeeded();
+            if (refreshedToken) {
+                token = refreshedToken;
+                response = await fetch(`${apiBase}/api/auth/me/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+        }
+
         console.log('fetchCurrentUser: Response status', response.status);
         if (response.ok) {
             const data = await response.json();
             setUserData(data);
             return data;
-        } else {
-            console.error('fetchCurrentUser: Response not ok', response.status);
+        } else if (response.status === 401) {
+            console.warn('fetchCurrentUser: Token expired and could not be refreshed');
             return null;
+        } else {
+            console.warn('fetchCurrentUser: Server response not ok', response.status);
+            // Return cached user if server returned a 5xx error or rate limit
+            return getUserData();
         }
     } catch (error) {
-        console.error('Error fetching current user:', error);
-        return null;
+        console.error('Error fetching current user (network glitch):', error);
+        // Do not invalidate session on network error! Return cached user data
+        return getUserData();
     }
 }
 
@@ -74,9 +141,6 @@ async function updateAuthUI() {
     const loginBtn = document.querySelector('.login-btn');
     const nav = document.querySelector('nav');
     
-    console.log('updateAuthUI: nav element found?', !!nav);
-    console.log('updateAuthUI: loginBtn found?', !!loginBtn);
-    
     if (!nav) {
         console.log('updateAuthUI: No nav element, skipping');
         return;
@@ -84,16 +148,18 @@ async function updateAuthUI() {
     
     if (isAuthenticated()) {
         console.log('updateAuthUI: User is authenticated');
-        // fetch fresh user data from backend
         let userData = getUserData();
         if (!userData) {
             console.log('updateAuthUI: No user data in localStorage, fetching from backend');
             userData = await fetchCurrentUser();
+        } else {
+            // Re-validate in background without blocking or terminating
+            fetchCurrentUser().catch(() => {});
         }
         
-        if (!userData) {
-            console.log('updateAuthUI: No user data available, redirecting to login');
-            // token is invalid, clear and redirect to login
+        // Only log out if token is missing or refresh has explicitly failed and no user data
+        if (!userData && !getToken()) {
+            console.log('updateAuthUI: No valid session, clearing');
             logout();
             return;
         }

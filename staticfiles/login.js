@@ -57,6 +57,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.token) {
                     localStorage.setItem("token", data.token);
                 }
+                if (data.refresh) {
+                    localStorage.setItem("refresh_token", data.refresh);
+                }
                 if (data.user) {
                     localStorage.setItem("user", JSON.stringify(data.user));
                 }

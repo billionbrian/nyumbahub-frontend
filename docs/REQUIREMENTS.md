@@ -122,8 +122,8 @@ In `config/settings.py`:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nyumbahub_db',
-        'USER': 'nyumbahub_user',
+        'NAME': 'tapin_db',
+        'USER': 'tapin_user',
         'PASSWORD': 'your_password',
         'HOST': 'localhost',
         'PORT': '5432',
@@ -266,7 +266,7 @@ DATABASES = {
 ```bash
 # Clone repository
 git clone <repository-url>
-cd nyumbahub/nyumbahub-frontend
+cd tapin/tapin-frontend
 
 # Create virtual environment
 python3 -m venv venv
@@ -325,7 +325,7 @@ If PostgreSQL connection fails:
 sudo service postgresql status
 
 # Check connection
-psql -U postgres -d nyumbahub_db
+psql -U postgres -d tapin_db
 
 # Verify credentials in settings.py
 ```
