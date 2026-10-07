@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Property Management | TapIn</title>
+  <title>Property Management | NyumbaHub</title>
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="styles/global-ui.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -697,7 +697,7 @@
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
               </span>
               <h3>Tenant Account Detected</h3>
-              <p>You are signed in as <strong>@${user.username}</strong> (${user.email || 'Student/Tenant'}). Only registered Landlord accounts can list properties on TapIn.</p>
+              <p>You are signed in as <strong>@${user.username}</strong> (${user.email || 'Student/Tenant'}). Only registered Landlord accounts can list properties on NyumbaHub.</p>
               <div style="display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
                 <a href="signup.html" hx-get="signup.html" class="auth-prompt-btn">Register as Landlord →</a>
                 <button type="button" class="auth-prompt-btn" style="background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); cursor:pointer;" onclick="localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href='login.html';">Switch Account / Sign In</button>

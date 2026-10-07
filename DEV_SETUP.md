@@ -1,6 +1,6 @@
-# Developer Setup Guide: TapIn Platform
+# Developer Setup Guide: NyumbaHub Platform
 
-Welcome to the **TapIn** development team. This document provides a comprehensive, step-by-step walkthrough for configuring your local development environment from repository cloning to having the full-stack Django and client application running smoothly.
+Welcome to the **NyumbaHub** development team. This document provides a comprehensive, step-by-step walkthrough for configuring your local development environment from repository cloning to having the full-stack Django and client application running smoothly.
 
 ---
 
@@ -56,14 +56,14 @@ Clone the project repository to your local workspace and navigate into the proje
 
 ### Linux / macOS:
 ```bash
-git clone https://github.com/billionbrian/nyumbahub-frontend.git tapin
-cd tapin
+git clone https://github.com/billionbrian/nyumbahub-frontend.git nyumbahub
+cd nyumbahub
 ```
 
 ### Windows (PowerShell or Command Prompt):
 ```cmd
-git clone https://github.com/billionbrian/nyumbahub-frontend.git tapin
-cd tapin
+git clone https://github.com/billionbrian/nyumbahub-frontend.git nyumbahub
+cd nyumbahub
 ```
 
 ---
@@ -171,7 +171,7 @@ copy .env.example .env
 Review and adjust the generated `.env` file if necessary:
 
 ```env
-# TapIn Environment Configuration
+# NyumbaHub Environment Configuration
 DEBUG=True
 SECRET_KEY=django-insecure-development-key-change-in-production
 
@@ -193,7 +193,7 @@ MPESA_AUTO_CONFIRM_SIMULATION=True
 
 ## Step 5: Database Setup & Migrations
 
-TapIn utilizes SQLite (`db.sqlite3`) for local development by default, requiring zero external database daemon configuration.
+NyumbaHub utilizes SQLite (`db.sqlite3`) for local development by default, requiring zero external database daemon configuration.
 
 ### Apply Database Migrations
 
@@ -219,7 +219,7 @@ Running migrations:
 
 ### Seed Demo Landlord and Tenant Accounts
 
-TapIn includes a built-in management command to automatically provision test accounts:
+NyumbaHub includes a built-in management command to automatically provision test accounts:
 
 ```bash
 python manage.py create_demo_users
@@ -229,8 +229,8 @@ This provisions two pre-configured developer accounts:
 
 | Role | Username | Email | Password | Permissions |
 | :--- | :--- | :--- | :--- | :--- |
-| **Landlord** | `demo_landlord` | `demo_landlord@tapin.test` | `DemoLandlord123!` | Create, update, and manage property listings |
-| **Tenant** | `demo_tenant` | `demo_tenant@tapin.test` | `DemoTenant123!` | Browse, save favorites, simulate bookings |
+| **Landlord** | `demo_landlord` | `demo_landlord@nyumbahub.test` | `DemoLandlord123!` | Create, update, and manage property listings |
+| **Tenant** | `demo_tenant` | `demo_tenant@nyumbahub.test` | `DemoTenant123!` | Browse, save favorites, simulate bookings |
 
 ---
 
@@ -360,4 +360,4 @@ For architecture deep-dives and schema specifications, review:
 - [DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md)
 - [MPESA_INTEGRATION.md](docs/MPESA_INTEGRATION.md)
 
-Welcome aboard, and happy developing with **TapIn**!
+Welcome aboard, and happy developing with **NyumbaHub**!

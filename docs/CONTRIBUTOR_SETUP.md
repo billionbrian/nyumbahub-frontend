@@ -1,6 +1,6 @@
 # Contributor Setup Guide
 
-This guide will help you set up the TapIn backend development environment on your local machine.
+This guide will help you set up the NyumbaHub backend development environment on your local machine.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ Before you begin, ensure you have the following installed:
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd tapin/tapin-frontend
+cd nyumbahub/nyumbahub-frontend
 ```
 
 ### 2. Create Virtual Environment
@@ -106,7 +106,7 @@ Use the superuser credentials you created in step 4.
 ## Project Structure Overview
 
 ```
-tapin-frontend/
+nyumbahub-frontend/
 ├── config/                 # Project configuration
 │   ├── settings.py         # Django settings
 │   ├── urls.py             # URL routing

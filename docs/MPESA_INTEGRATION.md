@@ -2,7 +2,7 @@
 
 ## Overview
 
-TapIn integrates Safaricom M-Pesa Daraja API (Lipa Na M-Pesa Online / STK Push) to enable seamless booking deposit and rent payments for tenants.
+NyumbaHub integrates Safaricom M-Pesa Daraja API (Lipa Na M-Pesa Online / STK Push) to enable seamless booking deposit and rent payments for tenants.
 
 ---
 
@@ -35,7 +35,7 @@ TapIn integrates Safaricom M-Pesa Daraja API (Lipa Na M-Pesa Online / STK Push) 
 
 ## Configuration (`.env`)
 
-In `tapin-frontend/.env`:
+In `nyumbahub-frontend/.env`:
 
 ```env
 # Safaricom Daraja API (Sandbox Mode)

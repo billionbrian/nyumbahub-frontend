@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landlord Dashboard - TapIn</title>
+    <title>Landlord Dashboard - NyumbaHub</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -170,7 +170,7 @@
 
         // Fetch and render properties
         async function fetchProperties() {
-            const res = await fetch("https://tapin-backend.onrender.com/api/properties/my-properties", {
+            const res = await fetch("https://nyumbahub-backend.onrender.com/api/properties/my-properties", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const properties = await res.json();
@@ -223,7 +223,7 @@
                 available: form.available.value === "true"
             };
 
-            const res = await fetch("https://tapin-backend.onrender.com/api/properties", {
+            const res = await fetch("https://nyumbahub-backend.onrender.com/api/properties", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

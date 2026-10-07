@@ -192,7 +192,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Geocoding Service Settings
 GEOCODING_PROVIDER = 'nominatim'
 GEOCODING_NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse'
-GEOCODING_NOMINATIM_USER_AGENT = 'TapIn-StudentHousing/1.0 (admin@tapin.test)'
+GEOCODING_NOMINATIM_USER_AGENT = 'NyumbaHub-StudentHousing/1.0 (admin@nyumbahub.test)'
 GEOCODING_TIMEOUT_SECONDS = 5
 
 # Safaricom Daraja M-Pesa Configuration

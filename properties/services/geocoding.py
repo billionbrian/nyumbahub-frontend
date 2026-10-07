@@ -25,7 +25,7 @@ class NominatimGeocodingProvider(BaseGeocodingProvider):
     """
     def __init__(self, user_agent=None, base_url=None, timeout=None):
         self.user_agent = user_agent or getattr(
-            settings, 'GEOCODING_NOMINATIM_USER_AGENT', 'TapIn-StudentHousing/1.0 (admin@tapin.test)'
+            settings, 'GEOCODING_NOMINATIM_USER_AGENT', 'NyumbaHub-StudentHousing/1.0 (admin@nyumbahub.test)'
         )
         self.base_url = base_url or getattr(
             settings, 'GEOCODING_NOMINATIM_URL', 'https://nominatim.openstreetmap.org/reverse'

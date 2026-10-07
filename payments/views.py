@@ -52,7 +52,7 @@ def initiate_payment(request):
         except Property.DoesNotExist:
             pass
 
-    account_ref = f"PROP-{prop.id}" if prop else "TapIn"
+    account_ref = f"PROP-{prop.id}" if prop else "NyumbaHub"
     trans_desc = f"Booking {prop.title[:15]}" if prop else "Rent Payment"
 
     daraja_client = MpesaDarajaClient()

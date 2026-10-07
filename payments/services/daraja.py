@@ -219,7 +219,7 @@ class MpesaDarajaClient:
         self,
         phone_number: str,
         amount: int | float,
-        account_reference: str = 'TapIn',
+        account_reference: str = 'NyumbaHub',
         transaction_desc: str = 'Property Booking'
     ) -> dict:
         """

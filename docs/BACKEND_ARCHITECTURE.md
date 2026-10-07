@@ -2,7 +2,7 @@
 
 ## Overview
 
-TapIn backend is built using **Django 6.0.6** with **Django REST Framework (DRF)** to provide a robust RESTful API for the property listing platform. The architecture follows Django's Model-View-Template (MVT) pattern with REST API principles.
+NyumbaHub backend is built using **Django 6.0.6** with **Django REST Framework (DRF)** to provide a robust RESTful API for the property listing platform. The architecture follows Django's Model-View-Template (MVT) pattern with REST API principles.
 
 ## Technology Stack
 
@@ -28,7 +28,7 @@ TapIn backend is built using **Django 6.0.6** with **Django REST Framework (DRF)
 ## Project Structure
 
 ```
-tapin-frontend/
+nyumbahub-frontend/
 ├── config/                 # Project configuration
 │   ├── settings.py         # Django settings (database, auth, CORS, JWT)
 │   ├── urls.py             # Main URL routing
