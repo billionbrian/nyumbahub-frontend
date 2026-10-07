@@ -76,6 +76,22 @@ body {
   overflow-x: hidden;
 }
 
+.logo-link {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  gap: 2px;
+}
+
+.logo-link:hover {
+  text-decoration: none;
+}
+
+.logo-link:hover .logo-tagline .tagline-text {
+  color: var(--text-primary);
+}
+
 .logo {
   font-size: clamp(1.35rem, 4vw, 1.8rem);
   color: var(--text-primary);
@@ -83,13 +99,58 @@ body {
   line-height: 1;
   margin: 0;
   text-transform: none;
-  letter-spacing: normal;
+  letter-spacing: -0.01em;
   display: inline-flex;
   align-items: center;
 }
 
 .logo span {
   color: var(--brand-primary);
+}
+
+.logo-tagline {
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  transition: color 0.2s ease;
+  margin-top: 1px;
+}
+
+.logo-tagline .tagline-brand {
+  color: var(--brand-primary);
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+}
+
+.logo-tagline .tagline-dot {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  font-size: 0.55rem;
+}
+
+.logo-tagline .tagline-text {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+  transition: color 0.2s ease;
+}
+
+@media (max-width: 480px) {
+  .logo-tagline {
+    font-size: 0.58rem;
+    gap: 4px;
+  }
+  .logo-tagline .tagline-brand {
+    font-size: 0.6rem;
+  }
 }
 
 .navbar nav a {
