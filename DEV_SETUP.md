@@ -1,6 +1,7 @@
-# Developer Setup Guide: NyumbaHub Platform
+# 🛠 Developer Setup Guide: NyumbaHub Platform
+### *TapInn • Tap into your next home*
 
-Welcome to the **NyumbaHub** development team. This document provides a comprehensive, step-by-step walkthrough for configuring your local development environment from repository cloning to having the full-stack Django and client application running smoothly.
+Welcome to the **NyumbaHub** engineering team. This guide provides an end-to-end, reproducible setup walkthrough to configure your local development environment on **Linux**, **macOS**, and **Windows** (PowerShell & Command Prompt), from repository cloning to having the full-stack Django application, database, and client running smoothly.
 
 ---
 
@@ -13,55 +14,65 @@ Welcome to the **NyumbaHub** development team. This document provides a comprehe
    - [Windows (PowerShell)](#windows-powershell)
    - [Windows (Command Prompt)](#windows-command-prompt)
 4. [Step 3: Install Project Dependencies](#step-3-install-project-dependencies)
-5. [Step 4: Environment Variables Configuration](#step-4-environment-variables-configuration)
+5. [Step 4: Environment Variables Configuration (`.env`)](#step-4-environment-variables-configuration-env)
 6. [Step 5: Database Setup & Migrations](#step-5-database-setup--migrations)
    - [Apply Database Migrations](#apply-database-migrations)
-   - [Seed Demo Landlord and Tenant Accounts](#seed-demo-landlord-and-tenant-accounts)
+   - [Provision Demo Accounts](#provision-demo-accounts)
    - [Create an Administrative Superuser](#create-an-administrative-superuser)
 7. [Step 6: Collect Static Assets](#step-6-collect-static-assets)
 8. [Step 7: Launch the Development Server](#step-7-launch-the-development-server)
 9. [Step 8: Verify Application Access](#step-8-verify-application-access)
-10. [Step 9: Running Tests and System Checks](#step-9-running-tests-and-system-checks)
+10. [Step 9: Testing & Code Validation](#step-9-testing--code-validation)
 11. [Troubleshooting & Frequently Encountered Issues](#troubleshooting--frequently-encountered-issues)
 
 ---
 
 ## 1. System Prerequisites
 
-Ensure the following tools are installed on your workstation prior to beginning setup:
+Before starting, verify that the following utilities are installed on your system:
 
 - **Git**: Version 2.30 or higher ([Download Git](https://git-scm.com/downloads))
 - **Python**: Version 3.10, 3.11, or 3.12 ([Download Python](https://www.python.org/downloads/))
-  - *Windows note*: When running the Python installer, ensure the checkbox **"Add Python to PATH"** is checked.
-- **pip**: Package installer for Python (bundled with standard Python installations)
+  - *Windows note*: During installation, ensure the checkbox **"Add Python to PATH"** is selected.
+- **pip**: Standard package installer for Python (bundled with Python).
 
-Verify your installations in your terminal:
+Verify your local installation in your terminal:
 
 ```bash
 # Verify Git
 git --version
 
-# Verify Python
-python --version    # or: python3 --version
+# Verify Python (should output 3.10.x, 3.11.x, or 3.12.x)
+python --version    # On Linux/macOS: python3 --version
 
 # Verify Pip
-pip --version       # or: python -m pip --version
+pip --version       # On Linux/macOS: python3 -m pip --version
 ```
 
 ---
 
 ## Step 1: Clone the Repository
 
-Clone the project repository to your local workspace and navigate into the project directory:
+Clone the project repository to your local workspace:
 
 ### Linux / macOS:
 ```bash
+# Via SSH (Recommended)
+git clone git@github.com:billionbrian/nyumbahub-frontend.git nyumbahub
+cd nyumbahub
+
+# Or via HTTPS
 git clone https://github.com/billionbrian/nyumbahub-frontend.git nyumbahub
 cd nyumbahub
 ```
 
 ### Windows (PowerShell or Command Prompt):
 ```cmd
+:: Via SSH (Recommended)
+git clone git@github.com:billionbrian/nyumbahub-frontend.git nyumbahub
+cd nyumbahub
+
+:: Or via HTTPS
 git clone https://github.com/billionbrian/nyumbahub-frontend.git nyumbahub
 cd nyumbahub
 ```
@@ -70,7 +81,7 @@ cd nyumbahub
 
 ## Step 2: Create and Activate a Virtual Environment
 
-Always maintain an isolated virtual environment to avoid package dependency conflicts with system-level Python libraries.
+Always maintain an isolated virtual environment to avoid dependency conflicts.
 
 ### Linux & macOS
 
@@ -92,7 +103,7 @@ source venv/bin/activate
 # 1. Create a virtual environment named 'venv'
 python -m venv venv
 
-# 2. (Optional) If script execution is restricted on your machine, permit local scripts:
+# 2. (If script execution is restricted on your workstation, enable local scripts)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 # 3. Activate the virtual environment
@@ -103,55 +114,51 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ---
 
-### Windows (Command Prompt)
+### Windows (Command Prompt `cmd.exe`)
 
 ```cmd
-# 1. Create a virtual environment named 'venv'
+:: 1. Create a virtual environment named 'venv'
 python -m venv venv
 
-# 2. Activate the virtual environment
+:: 2. Activate the virtual environment
 venv\Scripts\activate.bat
 ```
 
-*Upon activation, your command line prompt will display `(venv)`.*
+*Upon activation, your Command Prompt will display `(venv)`.*
 
 ---
 
 ## Step 3: Install Project Dependencies
 
-With the virtual environment active, ensure `pip` is up to date, then install all project requirements specified in `requirements.txt`:
+With your virtual environment active, upgrade `pip` and install all pinned packages:
 
 ### Linux / macOS:
 ```bash
-# Upgrade pip to the latest release
 python3 -m pip install --upgrade pip
-
-# Install project dependencies
 pip install -r requirements.txt
 ```
 
 ### Windows:
 ```cmd
-# Upgrade pip to the latest release
 python -m pip install --upgrade pip
-
-# Install project dependencies
 pip install -r requirements.txt
 ```
 
-Key dependencies installed include:
-- `Django 6.0+`: Core web framework
-- `djangorestframework`: REST API framework
-- `djangorestframework-simplejwt` & `PyJWT`: JSON Web Token authentication
-- `django-cors-headers`: Cross-Origin Resource Sharing handler
-- `requests`: External HTTP client (Daraja M-Pesa & Nominatim geocoding)
-- `python-dotenv`: Environment configuration parser
+### Core Packages Installed:
+- **`Django 6.0.6`**: Web framework powering models, views, and routing.
+- **`djangorestframework 3.17.1`**: RESTful API framework and serialization.
+- **`djangorestframework-simplejwt 5.5.1` & `PyJWT 2.13.0`**: Stateless JSON Web Token authentication.
+- **`django-cors-headers 4.9.0`**: Cross-Origin Resource Sharing middleware.
+- **`django-filter 24.3`**: Flexible URL query parameter filtering.
+- **`psycopg2-binary 2.9.12`**: PostgreSQL database connector (production-ready).
+- **`requests >= 2.31.0`**: External HTTP client (Daraja M-Pesa & Nominatim geocoding).
+- **`python-dotenv >= 1.0.0`**: Environment variable loading.
 
 ---
 
-## Step 4: Environment Variables Configuration
+## Step 4: Environment Variables Configuration (`.env`)
 
-Copy the example environment configuration template into your local `.env` file:
+Copy the provided example environment template into your local `.env`:
 
 ### Linux / macOS:
 ```bash
@@ -168,12 +175,15 @@ Copy-Item .env.example .env
 copy .env.example .env
 ```
 
-Review and adjust the generated `.env` file if necessary:
+Your default `.env` is pre-configured for sandbox development:
 
 ```env
-# NyumbaHub Environment Configuration
+# Core Django
 DEBUG=True
 SECRET_KEY=django-insecure-development-key-change-in-production
+
+# OpenStreetMap Nominatim User Agent
+GEOCODING_NOMINATIM_USER_AGENT=NyumbaHub-StudentHousing/1.0 (admin@nyumbahub.test)
 
 # Safaricom Daraja API Configuration (Sandbox)
 MPESA_ENVIRONMENT=sandbox
@@ -187,74 +197,59 @@ MPESA_FALLBACK_ON_TIMEOUT=True
 MPESA_AUTO_CONFIRM_SIMULATION=True
 ```
 
-> **Security Note:** Never commit your production `.env` file to version control. The `.gitignore` is pre-configured to exclude `.env`.
+> **Note:** `.env` is ignored by `.gitignore` to prevent leaking secrets.
 
 ---
 
 ## Step 5: Database Setup & Migrations
 
-NyumbaHub utilizes SQLite (`db.sqlite3`) for local development by default, requiring zero external database daemon configuration.
+NyumbaHub uses SQLite3 (`db.sqlite3`) for local development by default, requiring no database daemon setup.
 
 ### Apply Database Migrations
 
-Execute the migrations to initialize the database schema for authentication, user management, property listings, and payment models:
+Initialize database schemas across `accounts`, `properties`, and `payments`:
 
 ```bash
 python manage.py migrate
 ```
 
-Expected terminal output:
-```text
-Operations to perform:
-  Apply all migrations: accounts, admin, auth, contenttypes, payments, properties, sessions
-Running migrations:
-  Applying contenttypes.0001_initial... OK
-  Applying auth.0001_initial... OK
-  ...
-  Applying properties.0001_initial... OK
-  Applying payments.0001_initial... OK
-```
-
 ---
 
-### Seed Demo Landlord and Tenant Accounts
+### Provision Demo Accounts
 
-NyumbaHub includes a built-in management command to automatically provision test accounts:
+Run the custom management command to provision pre-configured test users:
 
 ```bash
 python manage.py create_demo_users
 ```
 
-This provisions two pre-configured developer accounts:
-
-| Role | Username | Email | Password | Permissions |
-| :--- | :--- | :--- | :--- | :--- |
-| **Landlord** | `demo_landlord` | `demo_landlord@nyumbahub.test` | `DemoLandlord123!` | Create, update, and manage property listings |
-| **Tenant** | `demo_tenant` | `demo_tenant@nyumbahub.test` | `DemoTenant123!` | Browse, save favorites, simulate bookings |
+This creates:
+- **Landlord**: `demo_landlord` (`demo_landlord@nyumbahub.test` / `DemoLandlord123!`)
+- **Tenant**: `demo_tenant` (`demo_tenant@nyumbahub.test` / `DemoTenant123!`)
 
 ---
 
 ### Create an Administrative Superuser
 
-To access the Django Admin interface at `/admin/`, create a local superuser:
+To access the Django Admin panel at `/admin/`:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Follow the prompts to enter your username, email, and password.
+Follow the prompts to enter a username, email, and password.
 
 ---
 
 ## Step 6: Collect Static Assets
 
-Compile and sync all static frontend assets (HTML templates, styling, scripts, and media handlers):
+Compile and sync static files (HTML templates, CSS styles, JavaScript, and fonts):
 
 ```bash
 python manage.py collectstatic --noinput
 ```
 
-This synchronizes client assets to the `staticfiles/` directory served by Django.
+This synchronizes client assets to `staticfiles/` which Django serves during development and production.
 
 ---
 
@@ -266,8 +261,7 @@ Start the Django local development server:
 python manage.py runserver
 ```
 
-When successful, your console will output:
-
+You should see:
 ```text
 Watching for file changes with StatReloader
 Performing system checks...
@@ -282,31 +276,32 @@ Quit the server with CONTROL-C.
 
 ## Step 8: Verify Application Access
 
-Open your web browser and navigate to the following endpoints to verify full platform operation:
+Navigate to the local URLs below to test key platform features:
 
-| Portal / View | Local URL | Description |
+| Feature / Page | URL | Description |
 | :--- | :--- | :--- |
-| **Home / Discovery** | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Main property search, filtering, and listings |
-| **Interactive Map** | [http://127.0.0.1:8000/map.html](http://127.0.0.1:8000/map.html) | Leaflet/OSM geospatial pin explorer |
-| **Authentication** | [http://127.0.0.1:8000/login.html](http://127.0.0.1:8000/login.html) | Sign-in portal for tenants and landlords |
-| **Property Management** | [http://127.0.0.1:8000/add-property.html](http://127.0.0.1:8000/add-property.html) | Landlord property creation and editing |
-| **Django Admin** | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Backend database administration |
-| **API Endpoints** | [http://127.0.0.1:8000/api/properties/](http://127.0.0.1:8000/api/properties/) | RESTful API data feeds |
+| **Main Portal / Home** | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Property search, filters, cards, and TapInn header branding |
+| **Interactive Map** | [http://127.0.0.1:8000/map.html](http://127.0.0.1:8000/map.html) | Leaflet/OSM geospatial map with custom teardrop pins |
+| **Sign In** | [http://127.0.0.1:8000/login.html](http://127.0.0.1:8000/login.html) | Login with `demo_tenant` or `demo_landlord` |
+| **Create Listing** | [http://127.0.0.1:8000/add-property.html](http://127.0.0.1:8000/add-property.html) | Landlord property management and photo uploader |
+| **Digital Lease** | [http://127.0.0.1:8000/digital-agreement.html](http://127.0.0.1:8000/digital-agreement.html) | Tenancy agreement generator with signature canvas |
+| **Django Admin** | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Database model inspection and superuser operations |
+| **REST API** | [http://127.0.0.1:8000/api/properties/](http://127.0.0.1:8000/api/properties/) | Headless DRF endpoints with browsable API |
 
 ---
 
-## Step 9: Running Tests and System Checks
+## Step 9: Testing & Code Validation
 
-Run automated test suites and framework validation to ensure code integrity:
+Before submitting any code changes, verify that all system checks and tests pass:
 
 ```bash
-# 1. Run Django System Integrity Check
+# 1. System check
 python manage.py check
 
-# 2. Run all unit and integration test suites
+# 2. Run all tests
 python manage.py test
 
-# 3. Run individual application tests
+# 3. Test individual apps
 python manage.py test accounts
 python manage.py test properties
 python manage.py test payments
@@ -317,47 +312,43 @@ python manage.py test payments
 ## Troubleshooting & Frequently Encountered Issues
 
 ### 1. Windows: "File ... cannot be loaded because running scripts is disabled on this system"
-- **Cause**: PowerShell execution policies default to `Restricted`.
-- **Solution**: Open PowerShell as Current User and execute:
+- **Cause**: PowerShell restricts script execution by default.
+- **Solution**: Execute the following in PowerShell:
   ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   ```
-  Then reactivate the virtual environment: `.\venv\Scripts\Activate.ps1`.
+  Then reactivate: `.\venv\Scripts\Activate.ps1`.
 
-### 2. "Command 'python' not found" (Linux/macOS)
-- **Cause**: Systems often alias Python 3 as `python3`.
-- **Solution**: Use `python3` and `python3 -m pip` throughout commands, or configure an alias:
+### 2. "Command 'python' not found" (Linux / macOS)
+- **Cause**: Python 3 is installed as `python3`.
+- **Solution**: Use `python3` and `python3 -m pip`, or add an alias to your `~/.bashrc` / `~/.zshrc`:
   ```bash
   alias python=python3
   ```
 
-### 3. Port 8000 is Already in Use
-- **Cause**: Another service or orphaned Django instance is occupying port 8000.
-- **Solution**: Specify an alternative port when launching `runserver`:
+### 3. Port 8000 in Use
+- **Cause**: Another service or orphaned process is listening on port 8000.
+- **Solution**: Start the server on an alternative port:
   ```bash
   python manage.py runserver 8080
   ```
-  Access the platform at `http://127.0.0.1:8080/`.
 
-### 4. Database Lock / SQLite Errors (`sqlite3.OperationalError: database is locked`)
-- **Cause**: Concurrent write locks or interrupted transactions.
-- **Solution**: Stop all running Django processes (`Ctrl + C`), ensure no other terminal has an active Django shell, and restart `runserver`.
+### 4. Database Locked (`sqlite3.OperationalError: database is locked`)
+- **Cause**: An active transaction or concurrent write is locking SQLite.
+- **Solution**: Stop all active Django servers and shell sessions (`Ctrl + C`), then restart `runserver`.
 
-### 5. `ModuleNotFoundError: No module named '...'`
-- **Cause**: Dependencies were installed globally or virtual environment is deactivated.
-- **Solution**: Verify `(venv)` appears in your prompt, then run:
-  ```bash
-  pip install -r requirements.txt
-  ```
+### 5. `ModuleNotFoundError: No module named 'rest_framework'`
+- **Cause**: The virtual environment is either inactive or dependencies were installed globally.
+- **Solution**: Confirm `(venv)` is shown in your terminal prompt, then run `pip install -r requirements.txt`.
 
 ---
 
-## Need Further Help?
+## Additional Documentation
 
-For architecture deep-dives and schema specifications, review:
-- [BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md)
-- [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
-- [DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md)
-- [MPESA_INTEGRATION.md](docs/MPESA_INTEGRATION.md)
+- [README.md](README.md) - Platform Overview & API Reference
+- [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md) - Architectural Deep-Dive
+- [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) - API Endpoints Specification
+- [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) - Database Schema Reference
+- [docs/MPESA_INTEGRATION.md](docs/MPESA_INTEGRATION.md) - Safaricom Daraja M-Pesa Integration Guide
 
-Welcome aboard, and happy developing with **NyumbaHub**!
+Happy building with **NyumbaHub** & **TapInn**!
