@@ -1,11 +1,11 @@
 # 🚂 Railway Deployment Guide — NyumbaHub (TapInn)
 
-**For:** Repo owner / person with access to the private GitHub repo  
+**For:** Anyone with access to the private GitHub repo  
 **Goal:** Deploy NyumbaHub to Railway (free tier) with PostgreSQL  
 **Domain:** `nyumbahubtapinn.co.ke`  
 **Repo:** `billionbrian/nyumbahub-frontend`
 
-> ⚠️ **Important:** This repo is **private**. Only the owner (or someone with write access) can clone/push/deploy it. The contributor has already pushed all production-ready code — you just need to run the deploy on Railway.
+> ⚠️ **Important:** This repo is **private**. You need write access to clone/push/deploy it. All production-ready code has already been pushed — you just need to run the deploy on Railway.
 
 ---
 
@@ -129,7 +129,7 @@ In the Railway dashboard, go to your project → **Variables** tab. Add every va
 4. Add those records at your domain registrar (where you bought `nyumbahubtapinn.co.ke`)
 5. Wait for DNS to propagate (minutes to hours)
 
-> ⚠️ You need access to the domain registrar's DNS settings. If the domain owner is not available, you can still test on the Railway-provided URL (`*.up.railway.app`) and add the custom domain later.
+> ⚠️ You need access to the domain registrar's DNS settings. If you don't have access, you can still test on the Railway-provided URL (`*.up.railway.app`) and add the custom domain later.
 
 ---
 
@@ -190,7 +190,7 @@ Open these URLs in your browser:
 | `config/settings.py` | Production-ready Django settings |
 | `.env.example` | Template of all environment variables |
 | `DEPLOY_RAILWAY.md` | Technical deploy runbook |
-| `RAILWAY_OWNER_DEPLOY_GUIDE.md` | This guide |
+| `DEPLOYMENT_GUIDE.md` | This guide |
 
 ---
 
