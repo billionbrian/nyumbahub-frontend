@@ -1,0 +1,14 @@
+# NyumbaHub cloudflared named tunnel config
+# Domain: nyumbahubtapinn.co.ke
+# Tunnel ID: f2731cee-ee96-4717-9c71-f4bc2f1e7025
+#
+# Run: cloudflared --config cloudflared-config.yml tunnel run
+#
+
+tunnel: f2731cee-ee96-4717-9c71-f4bc2f1e7025
+credentials-file: /home/zayne/nyumbahub/nyumbahub-frontend/credentials/nyumbahub.json
+
+ingress:
+  - hostname: nyumbahubtapinn.co.ke
+    service: http://localhost:8000
+  - service: http_status:404

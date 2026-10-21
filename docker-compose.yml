@@ -1,0 +1,100 @@
+version: "3.9"
+
+services:
+  # ---------------------------------------------------------------
+  # PostgreSQL — production database, mirrored locally
+  # ---------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: nyumbahub_db
+    environment:
+      POSTGRES_DB: nyumbahub
+      POSTGRES_USER: nyumbahub
+      POSTGRES_PASSWORD: nyumbahub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nyumbahub -d nyumbahub"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  # ---------------------------------------------------------------
+  # Redis — sessions / cache (matches production SESSION_BACKEND=redis)
+  # ---------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: nyumbahub_redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "6379:6379"
+
+  # ---------------------------------------------------------------
+  # Django app — gunicorn on port 8000
+  # ---------------------------------------------------------------
+  web:
+    build: .
+    container_name: nyumbahub_web
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DEBUG=True
+      - DJANGO_SECRET_KEY=dev-secret-key-change-me-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,.trycloudflare.com
+      - CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000
+      - CORS_ALLOWED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000
+      - DATABASE_URL=postgres://nyumbahub:nyumbahub@db:5432/nyumbahub
+      - DB_SSL_REQUIRE=False
+      - SESSION_BACKEND=redis
+      - REDIS_URL=redis://redis:6379/1
+      - USE_S3=False
+      - MEDIA_URL=/media/
+      - MPESA_ENVIRONMENT=sandbox
+      - MPESA_CONSUMER_KEY=
+      - MPESA_CONSUMER_SECRET=
+      - MPESA_SHORTCODE=174379
+      - MPESA_PASSKEY=bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919
+      - MPESA_CALLBACK_URL=http://localhost:8000/api/payments/callback/
+      - MPESA_TIMEOUT=30
+      - MPESA_FALLBACK_ON_TIMEOUT=True
+      - MPESA_AUTO_CONFIRM_SIMULATION=True
+      - LOG_LEVEL=DEBUG
+      - SECURE_SSL_REDIRECT=False
+      - GEOCODING_NOMINATIM_USER_AGENT=NyumbaHub-StudentHousing/1.0 (admin@nyumbahub.test)
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    command: /app/entrypoint.sh
+
+  # ---------------------------------------------------------------
+  # cloudflared tunnel — public URL -> localhost:8000
+  # ---------------------------------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: nyumbahub_tunnel
+    depends_on:
+      web:
+        condition: service_started
+    command: tunnel --url http://web:8000
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume:

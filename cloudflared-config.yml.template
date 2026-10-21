@@ -1,0 +1,27 @@
+# NyumbaHub cloudflared named tunnel config
+#
+# SETUP STEPS (run once on a machine that can reach Cloudflare):
+#
+#   1. cloudflared tunnel create nyumbahub
+#      -> note the Tunnel ID printed
+#
+#   2. cloudflared tunnel route dns nyumbahub <YOUR-DOMAIN.COM>
+#      -> creates a CNAME DNS record on Cloudflare pointing to the tunnel
+#
+#   3. Download the credentials file:
+#      cloudflared tunnel token <tunnel-id>   # gives you a token
+#      # OR copy credentials from ~/.cloudflared/<tunnel-id>.json
+#      -> save to: credentials/nyumbahub.json
+#
+#   4. Edit the three <...> placeholders below.
+#
+#   5. Run: ./deploy.sh
+#
+
+tunnel: <YOUR_TUNNEL_ID_OR_NAME>
+credentials-file: /home/zayne/nyumbahub/nyumbahub-frontend/credentials/nyumbahub.json
+
+ingress:
+  - hostname: <YOUR-DOMAIN.COM>
+    service: http://localhost:8000
+  - service: http_status:404

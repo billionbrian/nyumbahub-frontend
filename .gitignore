@@ -3,3 +3,17 @@ __pycache__/
 venv/
 .env
 db.sqlite3
+
+# Generated / collected static & media (Railway builds these at deploy)
+staticfiles/
+media/
+
+# Cloudflare tunnel credentials (secret)
+credentials/
+
+# Local dev secrets
+*.json
+
+# Editor artifacts
+*.swp
+.swo

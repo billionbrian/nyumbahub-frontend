@@ -159,39 +159,3 @@ class PropertyViewSet(viewsets.ModelViewSet):
         except PropertyImage.DoesNotExist:
             return Response({'error': 'Image not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
-
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-def initiate_payment(request):
-    """
-    Initiate M-Pesa payment for property booking
-    """
-    try:
-        phone = request.data.get('phone')
-        amount = request.data.get('amount')
-        
-        if not phone or not amount:
-            return Response(
-                {'error': 'Phone number and amount are required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        logger.info(f"Payment initiation request: phone={phone}, amount={amount}")
-        
-        # TODO: Integrate with actual M-Pesa API
-        # For now, return a mock response
-        return Response({
-            'message': 'STK Push sent successfully',
-            'phone': phone,
-            'amount': amount,
-            'status': 'pending'
-        }, status=status.HTTP_200_OK)
-        
-    except Exception as e:
-        logger.error(f"Payment initiation error: {str(e)}")
-        return Response(
-            {'error': 'Payment initiation failed'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
